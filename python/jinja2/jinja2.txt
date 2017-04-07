@@ -1,0 +1,130 @@
+{{{ Jinja2
+
+What is Jinja2?
+
+* templating language
+* inspired by Django templates
+* sandboxed execution
+* HTML escaping (by default)
+* template inheritance
+* easy to debug
+* extensible
+* syntax highlight for many editors
+* py2, py3, pypy support
+
+}}}
+{{{ Basic usage
+
+>>> from jinja2 import Template
+>>> template = Template('Hello {{ name }}!')
+>>> template.render(name = 'Cica')
+'Hello Cica!'
+
+}}}
+{{{ Loading templates
+
+* Envrinments to load, compile and render templates
+
+* many types on loaders, based on BaseLoader
+  * FileSystemLoader, PackageLoader, ...
+* they can be combined
+  * ChoiceLoader, PrefixLoader
+
+* compiled template bytecode is cached, custom cache can be implemented
+
+}}}
+{{{ Template syntax
+
+* default syntax is like Django's template syntax
+
+{% statement %}
+{{ expression }}
+{# comment #}
+
+}}}
+{{{ Variables
+
+Variables are passed to the tempalte during render via the context dictionary.
+
+In the template the followings are almost the same:
+{{ alma.beka }} // getattr(alma, 'beka'); alma.__getitem__('beka'); undefined
+{{ alma[beka] }} // alma.__getitem__('beka'); getattr(alma, 'beka'); undefined
+
+}}}
+{{{ Filters
+
+* filters can be chained, can have optional arguments
+
+{{ list|join(' ')|striptags|title }}
+=> title(striptags(str.join(' ', list)))
+
+* lot of built in filters
+* custom filters are easy to add
+
+def appendcica(value):
+    return value + 'cica'
+
+environment.filters['appendcica'] = appendcica
+
+}}}
+{{{ Tests
+
+{% if number is divisibleby(3) %}
+  divisible by 3
+{% else %}
+  not
+{% endif %}
+
+* lot of built in tests
+* custom tests are easy to add
+
+def greaterthan10(n):
+    return True if n > 10 else False
+
+environment.tests['greaterthan10'] = greaterthan10
+
+}}}
+{{{ Template inheritance
+
+base.html:
+<!DOCTYPE html>
+<html>
+  <head>
+    {% block head %}
+      <title{% block title %}{% endblock %} - My Webpage</title>
+      <link href="base.css" rel="stylesheet" />"
+    {% endblock %}
+  </head>
+  <body>
+    {% block body %}
+      Default content
+    {% endblock %}
+  </body>
+</html>
+
+child.html:
+{% extends "base.html" %}
+{% block title %}Child{% endblock %}
+{% block head %}
+  {{ super() }}
+  <link href="child.css" rel="stylesheet" />"
+{% endblock %}
+{% block body %}
+  <h1>{{ self.title() }}</h1>
+  New content
+{% endblock %}
+
+}}}
+{{{ Control structures
+
+* for x in list
+* if - elif - else
+* macro/call
+* filter
+* set
+* include
+* import/from .. import
+
+* custom tags can be implemented via jinja2.ext.Extension
+
+}}}

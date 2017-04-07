@@ -1,0 +1,74 @@
+
+{{{ RESTful services 
+
+ * REpresentational State Transfer
+
+}}}
+
+{{{ Resource-based
+
+  * URI -> resource (not action)
+  * multiple URI may refer the same resource
+    # /employees/12, /departments/dev/employees/3
+
+}}}
+
+{{{ Representations
+
+  * JSON or XML or ...
+  * manipulation through representation
+
+}}}
+
+{{{ use the HTTP
+
+  * URI: resource
+  * HTTP methods: actions (GET/PUT/POST/DELETE)
+  * HTTP response: status codes (200, 400, ...)
+  * HTTP headers
+    # Accept: application/json
+
+}}}
+
+{{{ HATEOAS
+
+  * Hypermedia as the Engine of Application State
+  * all above + provide links to resources in the body
+
+}}}
+
+{{{ Stateless
+
+  * server contains no client state 
+    # HTTP auth (over HTTPS)
+    # signed cookies, tokens
+    # (server side sessions)
+  * self-descriptive messages
+  * any session state is held on the client
+
+}}}
+
+{{{ Cacheable
+
+  * server should set proper Cache / ETag headers
+
+}}}
+
+{{{ Example
+
+  GET /users -> (200) retrieve user list
+  POST /users/ [data] -> (201) create & return new user
+  PUT /users/12 [data] -> (200) modify (create if not exists or 404) user 12
+  DELETE /users/12 -> (200) delete user 12
+
+}}}
+
+{{{ Tools
+
+  * Chrome dev tools, copy as curl
+  * Advanced REST client (https://chrome.google.com/webstore/detail/advanced-rest-client/hgmloofddffdnphfgcellkdfbfbjeloo)
+  * http://httpie.org/, http://pythonhosted.org/curlish/
+  * https://github.com/vfaronov/turqr
+ 
+}}}
+

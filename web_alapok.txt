@@ -1,0 +1,102 @@
+{{{
+
+WEB alapok
+==========
+
+}}}
+{{{
+
+TCP/IP
+======
+
+- IP
+- TCP
+- szerver/kliens
+
+}}}
+{{{
+
+Routing
+=======
+
+- statikus
+- dinamikus (RIP/OSPF/...)
+- BGP
+
+}}}
+{{{
+
+N√©vfelold√°s
+===========
+
+- gethostbyname() [nsswitch]
+- DNS
+
+}}}
+{{{
+
+HTTP (1.1)
+==========
+
+[request]
+POST /ide/megy/az/adat HTTP/1.1
+Host: localhost
+Accept-Encoding: gzip, deflate, compress
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 26
+
+alma=12&beka=Beka%20vagyok
+
+[response]
+HTTP/1.1 200 OK
+Date: Wed, 13 May 2015 11:12:13 GMT
+Connection: keep-alive
+Content-Encoding: gzip
+Content-Type: text/html
+Server: nginx/1.7.1
+
+}PÌ≥ãÌ≤Ç0Ì≤ºÌ≥≥+@`Ì≤≠Ì≥ÅG<Ì≤âÌ≤ºx2+TÌ≤°mÌ≥öbÌ≤¢_oyHÌ≤º
+
+}}}
+{{{
+
+HTTPS
+=====
+
+- SSL
+- certificates
+- => HTTP 2.0
+- [Let's Encrypt]
+
+}}}
+{{{
+
+HTTP Proxy
+==========
+
+- X-Forwarded-For: c, p1, p2, ...
+- NetScaler, CDN-ek
+- HTTPS?
+
+}}}
+{{{
+
+CGI/FCGI
+========
+
+- k√∂rnyezeti v√°ltoz√≥k, stdin/stdout
+- "fast" - bin√°ris protocol, futva marad(hat)
+
+}}}
+{{{
+
+Sk√°l√°z√≥d√°s alacsony szinten
+===========================
+
+- Proxy (CDN-ek)
+- DNS
+- Routing
+
+}}}
+
+# vim: foldmethod=marker

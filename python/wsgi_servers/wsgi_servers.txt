@@ -1,0 +1,207 @@
+{{{ WSGI servers
+
+Different requirements
+- during development
+- for production
+
+}}}
+{{{ WSGI servers for development
+
+- wsgiref.simple_server
+- werkzeug.serving
+
+}}}
+{{{ wsgiref.simple_server
+
++ part of the Python standard library - available everywhere
+
+- no extra features (debugging, live reload, static files, ...)
+
+py> make_server(HOST, PORT, app).serve_forever()
+
+}}}
+{{{ werkzeug.serving
+
++ lot of extra features
+  * live reload
+  * debugger (!)
+  * static file serving
+  * SSL support
+
+py> run_simple(HOST, PORT, app)
+
+}}}
+{{{ WSGI servers for production
+
+- CherryPy
+- Gunicorn
+- uWSGI
+- Gevent
+- Tornado
+- Twisted Web
+- ...
+
+}}}
+{{{ CherryPy
+
++ pure python
+  * py2, py3, pypy, jython, ...
++ full featured web framework
++ compact, simple
++ static files
++ SSL support
+
+* uses threads
+
+}}}
+{{{ Gunicorn
+
++ pure python
+  * py2, py3, pypy, ...
++ simple wsgi/web server
++ SSL support
++ extensible
+
+* pre-forking, various worker configurations (sync/async, ...)
+
+}}}
+{{{ uWSGI
+
++ written in C, uses libpython/cffi
+  * py2, py3, pypy
++ nginx module (uwsgi protocol)
++ not python/wsgi only
+
+* pre-/post-forking model
+
+}}}
+{{{ Gevent
+
++ async (like) networking library (websockets)
++ python + libev, corutines
+  * py2, py3, pypy
+  (py3 and pypy compatible version was released after I started this document)
+
+* greenlets (async microthreads)
+
+}}}
+{{{ Tornado
+
++ full async framework/network library (websockets)
++ python w/ cffi
+  * py2, py3, pypy
++ SSL support
+
+* async
+
+}}}
+{{{ Twisted Web
+
++ full featured, event driven networking library (websockets)
++ python + c modules
+  * py2
++ proxy/reverse-proxy
++ SSL support
++ virtual hosts
++ cgi/scgi support
+- a bit complicated to use (not the WSGI server, the Twisted library)
+- py3 support is not yet ready
+
+* async
+
+}}}
+{{{ Benchmarks
+
+Credits to Nicholas Piël
+http://nichol.as/benchmark-of-python-web-servers (a bit old)
+
+Reply Rate (TL;DR)
+
+gevent ≥ uwsgi > tornado ≥  cherrypy > gunicorn ≥  twisted
+
+uwsgi (1 worker [+ 1 master]):
+- 1000 rps, 10000 sum req:
+  - Connection time [ms]: min 0.1 avg 0.2 max 1.1 median 0.5
+  - 1000.1 req/s (1.0 ms/req)
+- 2000 rps, 10000 sum req:
+  - Connection time [ms]: min 0.2 avg 0.3 max 0.8 median 0.5
+  - 2000.2 req/s (0.5 ms/req)
+- 3000 rps, 10000 sum req:
+  - Connection time [ms]: min 0.2 avg 0.4 max 1.6 median 0.5
+  - 3000.1 req/s (0.3 ms/req)
+
+gevent@py3 (1 process):
+- 1000 rps, 10000 sum req:
+  - Connection time [ms]: min 0.3 avg 0.3 max 1.1 median 0.5
+  - 1000.1 req/s (1.0 ms/req)
+- 2000 rps, 10000 sum req:
+  - Connection time [ms]: min 0.3 avg 0.6 max 9.6 median 0.5
+  - 2000.1 req/s (0.5 ms/req)
+- 3000 rps, 10000 sum req:
+  - Connection time [ms]: min 0.3 avg 3.9 max 45.0 median 0.5
+  - 2999.4 req/s (0.3 ms/req)
+
+gevent@pypy (1 process):
+- 1000 rps, 10000 sum req:
+  - Connection time [ms]: min 0.1 avg 1.1 max 55.7 median 0.5
+  - 999.5 req/s (1.0 ms/req)
+- 2000 rps, 10000 sum req:
+  - Connection time [ms]: min 0.1 avg 3.1 max 66.4 median 0.5
+  - 2000.1 req/s (0.5 ms/req)
+- 3000 rps, 10000 sum req:
+  - Connection time [ms]: min 0.1 avg 139.9 max 3010.8 median 0.5
+  - 2851.7 req/s (0.4 ms/req)
+
+gevent@pypy w/ warmup [1000 request] (1 process):
+- 1000 rps, 10000 sum req:
+  - Connection time [ms]: min 0.1 avg 0.1 max 13.9 median 0.5
+  - 1000.1 req/s (1.0 ms/req)
+- 2000 rps, 10000 sum req:
+  - Connection time [ms]: min 0.1 avg 0.3 max 28.3 median 0.5
+  - 2000.2 req/s (0.5 ms/req)
+- 3000 rps, 10000 sum req:
+  - Connection time [ms]: min 0.1 avg 0.4 max 26.8 median 0.5
+  - 2999.7 req/s (0.3 ms/req)
+
+cherrypy@py3 (1 process):
+- 1000 rps, 10000 sum req:
+  - Connection time [ms]: min 0.3 avg 0.4 max 5.3 median 0.5
+  - 1000.1 req/s (1.0 ms/req)
+- 2000 rps, 10000 sum req:
+  - Connection time [ms]: min 0.3 avg 1.8 max 37.5 median 0.5
+  - 2000.1 req/s (0.5 ms/req)
+- 3000 rps, 10000 sum req:
+  - Connection time [ms]: min 0.6 avg 287.6 max 4207.1 median 51.5
+  - 1784.9 req/s (0.6 ms/req)
+  - Errors: fd-unavail 418
+
+cherrypy has a known issue w/ pypy
+
+Notes:
+- by default clean runs, no warmup (only one request by browser before htperf)
+- open file limit was set to 8k in the test environment, testing w/ 4k rps caused many "fd-unavailable" errors
+
+Conclusion:
+uWSGI and gevent@pypy (after warmup) performs quite well with minimal differences 
+
+}}}
+{{{ Starting WSGI apps
+
+- supervisor https://github.com/Supervisor/supervisor
+- circus https://github.com/circus-tent/circus
+
+}}}
+{{{ Typical setup / proposal
+
+[mixed environment, full control]
+Nginx for static files/load balancing w/
+* uwsgi
+* gevent@pypy
+
+[control over python only]
+* gevent, if available
+* cherrypy
+
+}}}
+
+# vim: foldmethod=marker

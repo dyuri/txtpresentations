@@ -1,0 +1,47 @@
+{{{ WSGI
+
+PEP-333
+PEP-3333
+
+}}}
+{{{ WSGI application
+
+A callable that accepts two parameters (environ, start_response) and returns an iterable of bytes.
+
+* environ: dictionary, environment variables from the server (~CGI), wsgi specific variables
+  * REQUEST_METHOD, PATH_INFO, HTTP_REFERER, ...
+  * wsgi specific, for example:
+    * wsgi.url_scheme (http/https)
+    * wsgi.input (request body stream)
+    * wsgi.errors (error output stream)
+    * wsgi.file_wrapper [optional] (system provided file-transmission function, like sendfile)
+* start_response: callable, accepting 2 + 1 parameters (status, response_headers, [exc_info])
+  * status: HTTP status, like "200 OK" or "404 Not Found"
+  * response_headers: HTTP headers as a list of tuples like
+      [('Content-Type', 'text/plain'), ('Set-Cookie', 'alma=1')]
+  * [exc_info: sys.exc_info() tuple, exception info]
+
+Examples: wsgi_app_example.py
+
+}}}
+{{{ WSGI server/gateway
+
+Invokes the application's callable for each request.
+
+}}}
+{{{ WSGI middleware
+
+Act as an application for the server, and as a server for the application:
+* must implement the application "interface"
+* should call the application (upon request)
+* [multiple middlewares can should be able to stack upon eachother]
+
+Examples:
+* URL routing
+* authentication
+* load balancing
+* request pre- or response postprocessing
+
+}}}
+
+# vim: foldmethod=marker

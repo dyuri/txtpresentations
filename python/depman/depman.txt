@@ -1,0 +1,62 @@
+{{{ Python dependency management
+}}}
+
+{{{ Installing packages
+
+From the "cheeseshop" (pypi.python.org).
+
+- `easy_install` (setuptools)
+  - sdist + egg support
+  - no dependency management
+  - no tracking (cannot upgrade/uninstall)
+- `pip`
+  - sdist + wheel support
+  - dependency management
+  - package tracking (upgrade/uninstall support)
+  - VCS support
+}}}
+
+{{{ Virtual environments
+
+`virtualenv` - Virtual python environments
+- with own `python` executable (for different python versions)
+- globally installed packages can be hidden (--no-site-packages)
+- supported by `pip`
+
+Various helpers like `virtualenvwrapper` or `pew`.
+
+=> `venv` - lightweight virtual environment support in py3.3+
+
+}}}
+
+{{{ Dependencies
+
+`requirements.txt`
+- pip install -r requirements.txt / pip freeze > requirements.txt
+- simple list of packages (with optional version tags)
+
+`Pipfile` (WIP)
+- multiple package-set support (like dev/prod)
+- PEP-508 support (like platform requirements)
+- `Pipfile.lock` - current state w/ package versions + hashes
+- pip support is under develompent
+
+}}}
+
+{{{ Pipenv
+
+Virtualenv + pip + Pipfile
+
+$ pipenv install
+- searches for Pipfile (in current and parent folders)
+- creates virtualenv based on project directory name
+- installs dependencies
+
+$ pipenv shell
+- virtual env shell
+
+}}}
+
+{{{
+# vim: foldmethod=marker
+}}}
