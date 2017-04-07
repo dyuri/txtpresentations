@@ -1,0 +1,536 @@
+{{{ The Terminal
+}}}
+{{{ Shell
+
+- bash or sh/csh/tcsh/ksh/zsh/*sh
+- capable of running simple (or not so simple) scripts
+
+- variables
+```
+$ export VAR=something
+$ echo $VAR
+something
+$ unset VAR
+$ echo $VAR
+
+```
+
+- if/for/...
+```
+$ for f in *; do
+    if [[ -f $f ]]; then
+      convert $f -resize 400x smaller_$f
+    fi
+  done
+```
+
+- `[backtick]`
+```
+$ FILELIST=`ls`
+$ echo $FILELIST
+...
+```
+
+}}}
+{{{ shortcuts [emacs mode]
+
+TAB - completition
+
+^C - break (SIGINT signal)
+^D - end-of-file (tell the current process that you have finished typing)
+^Z - suspend (SIGTSTP)
+
+^S - "silence" - no output is shown on screen (you hit it accidentally, and you don't have any idea why nothing is shown)
+^Q - "break the silence"
+
+^L - clear screen
+^A - go to the beginning of the line
+^E - go to the end of the line
+^W - delete previous word
+^U - delete whole line (useful if you mistyped your password)
+Alt+B - go back one word
+Alt+F - go forward one word
+
+^P (up) - previous command
+^N (down) - next command
+^R - reverse search command history
+
+set -o vi => vi mode (you don't want this)
+
+}}}
+{{{ special variables
+
+!! - last command
+!$ - last parameter of last command
+
+$$ - current process id
+$0, $1, $2 - parameters (for a script for example)
+$# - number of parameters
+$* - all the parameters (one string)
+$@ - all the parameters 
+$? - exit status of last command (0 - success, non-0 - something went wrong)
+
+}}}
+{{{ .bashrc 
+
+Performs simple operations at shell startup. 
+(There are others as well like /etc/profile, .profile, .bash_profile, ...)
+
+Set some variables: 
+```
+PATH=$PATH:~/bin
+PS1='Hello \t> '$
+EDITOR=vim
+```
+
+Create aliases:
+```
+alias ll='ls -la'
+alias eclipse='vim'
+```
+
+}}}
+{{{ man - manual pages
+
+$ man [any command here]
+
+}}}
+{{{ su / sudo - admin privileges
+
+`sudo` - execute _one_ command with admin rights (if you have the permissions)
+
+```
+$ sudo ls
+[your password]
+...
+$ whoami
+dyuri
+$ sudo whoami
+root
+$
+```
+
+`su` - change the user
+
+```
+$ su
+[root password]
+# whoami
+root
+```
+
+`su -` - login shell (changes directory to root's home, executes .profiles)
+`su - [username]` - login shell for [username], requires her/his password
+`sudo su - [username]` - be anyone, using your password
+
+}}}
+{{{ ls - list files
+
+ls -ltra
+ -l long (show owner, permissions, size, etc.)
+ -a show hidden (starting with .)
+ -t sort by modification time
+ -r reverse
+
+=> latest file at the bottom (probably the one you have just downloaded/modified/...)
+
+}}}
+{{{ permissions [classic]
+
+$ ls -l
+-rw-r--r--  1 dyuri users    1106 Oct  3  2016 .gitconfig
+drwxr-xr-x 51 dyuri users    4096 Mar 21 13:49 melo/
+ ---------
+
+rwx * 3 =>
+ r - read
+ w - write
+ x - execute (for files, "cd" permission for directories)
+
+user (u), group (g), others (o)
+
+First character:
+  - - normal file
+  d - directory
+  l - symbolic link
+  c - character device
+  b - block device
+
+  s - setuid/setgit (in place of x)
+  t - sticky bit (for /tmp and the likes, in place of x)
+
+`chown <user>[:<group>] <file>` - set user/group
+
+`chmod <permissions> <file>` - set permissions
+
+```
+$ chmod u+x file      # execute to user
+$ chmod a+w file      # write to "all"
+$ chmod o-r -R dir    # revoke read from 'others' in 'dir' recursively
+$ chmod 751 cica      # rwxr-x--x
+```
+
+}}}
+{{{ stdin/stdout
+
+You can redirect input/output (and errors) via > < |
+
+cmd > file            # redirects output into file (original file content will be lost)
+cmd 2> file           # redirects error output into file
+cmd > file 2>&1       # redirects stdout and stderr into file
+
+cmd >> file           # appends output of cmd at the end of file
+
+cmd < file            # use file as stdin
+cmd < file1 > file2   # you can combine them ofc
+
+cmd1 | cmd2           # use the stdout of cmd1 as the stdin of cmd2 (pipeline)
+
+cmd1 < file1 | cmd2 | cmd3 > file2 2>&1
+
+}}}
+{{{ directories
+
+cd [dir]              # change directory
+cd $HOME              # change to your home directory
+cd ~                  # change to your home directory
+cd                    # change to your home directory
+cd -                  # change back to the previous directory
+
+pushd / popd          # push current directory to stack / pop last one
+
+pwd                   # print current directory
+
+mkdir dir             # create directory
+mkdir -p dir1/dir2    # create full path
+rmdir dir             # remove directory - if empty
+
+}}}
+{{{ copy/move/remove
+
+cp file1 file2        # copy file1 to file2
+cp -R dir1 dir2       # copy dir1 recursively into dir2
+mv file1 file2        # rename or move file
+rm file               # remove file
+rm -rf dir            # remove dir recursively, without asking (dangerous)
+
+}}}
+{{{ ln - filesystem link
+
+"Files" are "links" to entities on disk. If such an entity has no links it can be overwriten.
+So technically you don't remove a file, but remove a link to it.
+
+`unlink` can remove one such link (`rm` is more "user friendly")
+
+`ln file1 file2` - create a new link for file1 as file2
+  - file1 and file2 will point to the same file, they have to be on the same device (partition)
+  - changing anything in either one will be visible in the other
+  - removing file1 or file2 will not delete the file from the dist
+  - (even removing both of them won't, but you won't be able to easily reference the file)
+
+`ln -s file1 file2` - create a symbolic link for file1 as file2
+  - symbolic links are "special text files" pointing to the original one
+  - they don't have to be in the same partition
+  - removing file2 (the link) won't affect file1
+  - removing file1 (the file) will break file2
+
+}}}
+{{{ file - file type info
+
+$ file tmp
+tmp: directory
+$ file .gitconfig
+.gitconfig: ASCII text
+$ file vim.png
+vim.png: PNG image data, 732 x 571, 8-bit/color RGB, non-interlaced
+
+}}}
+{{{ touch - create empty file / change modification time of file to 'now'
+
+$ touch cica.txt          # create empty cica.txt
+$ echo "cica" > cica.txt  # put "cica" string into cica.txt (would create cica.txt, if it'd not exsist)
+
+}}}
+{{{ df / du - free space, disk usage
+
+$ df -h                   # show free space - in human readable form
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda2       108G   80G   22G  79% /
+/dev/sdb1       336G  202G  117G  64% /mnt/ubi
+/dev/sdc1       110G  9.8G   94G  10% /home/dyuri/extra
+
+$ du -h                   # show disk usage / file (recursively, in human readable form)
+$ du -hs *                # show disk usage - summarized per directory
+
+}}}
+{{{ cat - read files
+
+$ cat file                # print file content to screen
+$ cat file | more         # use 'more' command as pager (crazy shortcuts)
+$ cat file | less         # use 'less' command as pager (better, vi-like shortcuts)
+$ less file               # the same as the previous, but it's not the unix way :P
+
+$ cat file | head -10     # show only the first 10 lines
+$ cat file | tail -20     # show only the last 20 lines
+$ cat file | head -12 | tail -2    # show lines 11 and 12
+
+$ tail -f file            # show the end of the file, don't stop on EOF, wait for file changes (useful for logfiles)
+
+}}}
+{{{ wc / sort
+
+$ wc .gitconfig           # count lines, words, characters in file
+56  167 1106 .gitconfig
+$ wc -l .gitconfig        # lines only
+56 .gitconfig
+
+# what project in fd repo takes the most space?
+$ du -ks fdsrc/trunk/projects | sort -n   # sort, as numbers
+20	DevServer
+32	MediaRepositoryService
+36	RefAdmin
+...
+70760	cms-gwt
+83968	RoutingServices
+405260	CMS-Admin-FE      # npm for the win
+
+}}}
+{{{ grep - search in files
+
+# search for a css class
+$ grep .grid-item *.css
+global.css:	.search-recommender.fdCouponCar .grid-item.carLastItem {
+newproducts.css:.newprod-grid .grid-view .grid-item-container {
+newproducts.css:.newprod-dfgs .grid-view .grid-item-container {
+search.css:.recipes-active .grid-item-container {
+
+# use regexp
+$ grep -e "\s.grid-view\s" *.css
+newproducts.css:.newprod-grid .grid-view .grid-item-container {
+newproducts.css:.newprod-dfgs .grid-view .grid-item-container {
+
+# recursively (gnu grep)
+$ grep -r -e "\s.grid-view\s"
+common/product_grid.css:.ddpp .grid-view .grid-item-container {
+common/product_grid.css:.newprod-featured .grid-view .grid-item-container {
+newproducts.css:.newprod-grid .grid-view .grid-item-container {
+newproducts.css:.newprod-dfgs .grid-view .grid-item-container {
+
+}}}
+{{{ find - search for files
+
+# show all the files in the current directory recursively
+$ find .
+
+# show all css files
+$ find . -name "*.css"
+
+# seach all css files for .grid-view class
+$ find . -name "*.css" | xargs -- grep -e "\s.grid-view\s"
+common/product_grid.css:.ddpp .grid-view .grid-item-container {
+common/product_grid.css:.newprod-featured .grid-view .grid-item-container {
+newproducts.css:.newprod-grid .grid-view .grid-item-container {
+newproducts.css:.newprod-dfgs .grid-view .grid-item-container {
+
+# or using ag (or ack)
+$ ag --css "\s.grid-view\s"
+common/product_grid.css
+592:.ddpp .grid-view .grid-item-container {
+598:.newprod-featured .grid-view .grid-item-container {
+newproducts.css
+72:.newprod-grid .grid-view .grid-item-container {
+80:.newprod-dfgs .grid-view .grid-item-container {
+
+}}}
+{{{ sed - stream editor, replace content
+
+$ cat .gitconfig | sed 's/bold/cica/'
+[color "diff"]
+  meta = yellow cica
+  frag = magenta cica
+  old = red cica
+  new = green cica
+
+$ sed -i 's/bold/cica/' .gitconfig    # edit in place
+
+# "css refactor"
+
+$ find . -name="*.css" | xargs -- sed -i 's/\.cica(.*)/.kutya\1/'
+
+$ echo "AlmaFa" | tr a-z A-Z
+ALMAFA
+
+# awk ...
+
+}}}
+{{{ tar - creating archives
+
+$ tar cfv cica.tar cica/          # create a tar with the content of 'cica/' (no compression
+$ tar xfv cica.tar                # extract the files
+
+$ tar cfvz cica.tgz cica/         # create tgz with the content of 'cica/' (gzip compression)
+$ tar xfvz cica.tgz               # extract the files
+
+$ gunzip cica.tgz                 # decompress cica.tgz (=> cica.tar)
+$ gzip cica.tar                   # compress cica.tar (=> cica.tar.gz)
+
+# gzip - compress one file (not that efficient, but very quick)
+
+$ echo "alma" > alma.txt
+$ gzip alma.txt                   # alma.txt.gz
+$ zcat alma.txt.gz                # read the gzipped file without uncompressing it
+alma
+
+# network is typically slower than gzip
+
+}}}
+{{{ ps - processes
+
+$ ps                              # show processes running in this shell
+$ ps -ef                          # show all processes (BSD style: ps axu)
+
+$ pgrep java                      # pid(s) of java process(es)
+
+$ pstree                          # show the process tree
+
+$ ls /proc                        # /proc filesystem (in linux/solaris/..., not in openbsd/osx)
+$ cat /proc/[pid]/environ         # environment variables available for the given process
+
+$ top                             # real time process resource allocation monitor
+
+$ kill [pid]                      # send SIGTERM (please stop) signal
+$ kill -9 [pid]                   # send SIGKILL (die f**ker) signal
+
+$ killall java                    # get rid of eclipse & weblogic
+$ killall -9 java                 # when the one above fails
+
+}}}
+{{{ fg/bg/jobs - shell job control
+
+$ sleep 1000 [or something long running]
+^Z
+[1]  + 31208 suspended  sleep 1000
+$ jobs -l
+[1]  + 31208 suspended  sleep 1000
+$ fg %1
+[1]  + 31208 continued  sleep 1000
+^Z
+$ bg %1
+[1]  + 31208 continued  sleep 1000
+(in background, you can use the shell again)
+$ 
+...
+[1]  + 31208 done       sleep 1000
+
+}}}
+{{{ host name lookup
+
+$ getent hosts jira.freshdirect.com         # use 'gethostbyname()' system call (this is what all your browser does)
+10.53.26.210    jira.freshdirect.com
+
+(root)# echo "127.0.0.10 jira.freshdirect.com" >> /etc/hosts
+$ getent hosts jira.freshdirect.com
+127.0.0.10      jira.freshdirect.com
+
+$ nslookup jira.freshdirect.com             # use DNS server only (this isn't what your browser does)
+Server:		192.168.253.35
+Address:	192.168.253.35#53
+
+Non-authoritative answer:
+Name:	jira.freshdirect.com
+Address: 10.53.26.210
+
+$ dig jira.freshdirect.com                  # more detailed answer
+; <<>> DiG 9.11.0-P3 <<>> jira.freshdirect.com
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 18700
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 1024
+;; QUESTION SECTION:
+;jira.freshdirect.com.		IN	A
+
+;; ANSWER SECTION:
+jira.freshdirect.com.	85925	IN	A	10.53.26.210
+
+;; Query time: 0 msec
+;; SERVER: 192.168.253.35#53(192.168.253.35)
+;; WHEN: Fri Apr 07 11:58:23 CEST 2017
+;; MSG SIZE  rcvd: 65
+
+}}}
+{{{ telnet - connect to a TCP port
+
+$ telnet icesus 8080
+Trying 127.0.0.1...
+Connected to icesus.
+Escape character is '^]'.
+GET / HTTP/1.1
+Host: icesus
+
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Accept-Ranges: bytes
+Access-Control-Allow-Origin: *
+Content-Type: text/html; charset=UTF-8
+Content-Length: 4283
+ETag: W/"10bb-Vuyh3hN7ZUQwbjSF0HZLW//0Bsw"
+Date: Fri, 07 Apr 2017 10:01:41 GMT
+Connection: keep-alive
+
+<!DOCTYPE html>
+<html lang="en" ng-app="foodkickApp">
+...
+
+
+# simple "chat", or "mock server"
+$ nc -lp 1234                     # listen on port 1234
+[other shell]
+$ telnet localhost 1234
+hello!
+
+}}}
+{{{ ssh - remote host access
+
+$ ssh root@gusto -i .ssh/id_rsa   # log in to gusto as root, using the provided rsa key
+
+# forward local 1234 port to the weblogic of web01.stprd1a using console.stprd1a
+$ ssh -L 1234:web01.stprd1a.nj01:7001 fdadmin@console.stprd1a.nj01
+
+$ ssh -X dyuri.horak.hu           # forward X protocol (linux windowing subsystem)
+
+# copy media files from afonya over ssh
+$ scp -r fdadmin@afonya:/opt/fddata/media ./media/
+
+# better way to do it, copy only updated files
+$ rsync -avz fdadmin@afonya:/opt/fddata/media/ ./media
+
+}}}
+{{{ http from the console
+
+# there is 'telnet' of course ...
+
+$ wget http://icesus/dyuri/txt_prezik/linux.txt   # download, and save as file
+
+$ curl http://icesus/dyuri/txt_prezik/linux.txt   # print to the console
+
+# for API "testing"
+$ sudo pip install httpie
+$ http GET http://icesus/dyuri/txt_prezik/linux.txt 
+HTTP/1.1 200 OK
+Accept-Ranges: bytes
+Connection: keep-alive
+Content-Length: 8983
+Content-Type: text/plain
+Date: Fri, 07 Apr 2017 10:21:45 GMT
+ETag: "58e65a87-2317"
+Last-Modified: Thu, 06 Apr 2017 15:11:03 GMT
+Server: nginx/1.11.10
+
+...
+
+}}}
+
+# vim: foldmethod=marker
