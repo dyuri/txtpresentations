@@ -1,0 +1,287 @@
+{{{ VIM basics
+
+Vi IMproved
+
+}}}
+{{{ History
+
+ * 1969 - ed
+ * 1976 - vi
+ * 1991 - vim
+(* 2015 - neovim)
+
+}}}
+{{{ vi
+
+ * "visual"
+ * POSIX standard
+ * default editor in most(?) unix like operating systems
+ * most probably it's not vi, but vim in 'compatibility' mode
+ * "Editor war" - Emacs vs. vi
+ * "the home row of the keyboard is the best place for your hands"
+
+}}}
+{{{ vim
+ 
+ * by Bram Moolenaar
+ * "Charityware", for the children of Uganda
+ * available for almost every OS
+ * runs in terminal, has a GUI as well (gvim)
+ * single configuration file (.vimrc), store it in the cloud and you are ready code everywhere
+ * highly customisable, has it's own scripting language (VimL) and a huge amount of plugins
+
+}}}
+{{{ neovim
+
+ * crowdfunded refactor of vim
+ * lot of (~30%) "old shit" dropped (like 8+3 filename support)
+ * async command execution and API for 3rd party software
+   * possibility for async/non-blocking plugins
+   * easy to embed into IDEs
+   * easy to create new user interfaces
+ * vim compatibility is high priority, vim patches are merged regularly
+
+}}}
+{{{ Modal editor
+
+Vim is a modal editor, you can do different things in different modes.
+
+ * normal - default, for moving around - ESC, ^[
+ * insert - for inserting text - i/I,a/A,o/O,s/S,(c/C),...
+   * replace - for overwriting text - R (r - for a single character)
+ * visual - for text selection with normal mode commands - v
+   * plain visual - v
+   * line visual - V
+   * block visual - ^V
+ * select - "windows like" select mode - gh
+ * command - for 'ex' commands, search, 'external' commands - :,/,!
+ * ex - for 'ex' command batches, no need to press : - gQ 
+
+(* easy mode - insert only mode for dummies - vim -y)
+
+}}}
+{{{ Quit
+
+https://stackoverflow.blog/2017/05/23/stack-overflow-helping-one-million-developers-exit-vim/
+
+ * ESC, :qa!
+
+ * ESC - takes you to 'normal' mode
+ * :qa! - quit from all windows, without saving
+   * q - quit (close window)
+   * a - from all window
+   * ! - I don't care about the changes
+
+or
+
+ * :wqa!
+   * w - write the changes
+   * q - quit (close window)
+   * a - all window
+   * ! - I don't care if you can't save the changes (disk is full, read only, meteor shower, ...)
+
+... and endless other possibilities (ZZ, :x, :!killall -9 vim, ...)
+
+}}}
+{{{ Buffers, windows, tabs
+
+Buffer
+ * a file loaded into memory for editing
+ * :ls - show buffers
+ * :b[#|n|p|d] - go to buffer number #, next, previous, delete current buffer
+
+Window
+ * A viewport onto a buffer
+ * Not an actual "window"
+ * :split :vsplit (:sp :vsp) - split current window in two
+ * :quit (:q) - close current window
+ * :only (:on) - close all the other windows
+ * ^W ^[H/J/K/L] - move cursor into other window
+
+Tabs
+ * A tab can hold one or more windows
+ * :tabnew :tabclose :tabonly :tabnext :tabprevious
+ * ! tabs are not associated with files (buffers) but with windows !
+
+}}}
+{{{ "Idiom"
+
+Vim "actions" consists of
+ * count (how many times)
+ * operator (do what)
+ * motion or text object (with what)
+
+}}}
+{{{ Operators
+
+ * c - change
+ * d - delete
+ * y - yank (copy)
+ * p - paste
+ * ~ - swap case (g~, gu - to lower, gU - to upper)
+ * ! - filter through an external command
+ * = - indent
+ * gq - text format
+ * <, > - remove/add indent level
+
+}}}
+{{{ Motions
+
+(in 'normal' mode)
+
+ * h/j/k/l - left/down/up/right (arrow keys might work, but why would you move your hands?)
+ * gg - go to first line, G - go to last line, #G - go to line number #
+ * {, (, }, ) previous / next paragraph / sentence
+ * b, w - back / forward a word
+ * 0, $ - beginning / end of the line
+ * t/T/f/F(ch) - find next (ch)aracter (f takes you in the exact position, f/F just before/after)
+ * */# - find current word (forward/backward)
+ * '', '. - go to last edit location (exact/line)
+ * % - go to matching bracket (or html tag with plugin)
+ * /(text) - find (text) fowrard, ?(text) - backward - n/N - next/previous match
+
+(you might accidentally use the arrow keys in 'insert' mode, but try to avoid)
+
+}}}
+{{{ Text objects
+
+Text object modifiers
+ * i - "inner"
+ * a - "a" text object (surrounding whitespace included)
+
+Text objects
+ * w/W - word
+ * p - paragraph
+ * '/"/` - 'text', "text", `text`
+ * [/]/(/)/{/}/</> - [text], (text), {text}, <text>
+ * t - xml tag
+ * plugins may provide more
+
+}}}
+{{{ "Idiom" examples
+
+ * daw - delete a word
+ * cit - change the content of a tag
+ * y2w - copy (yank) 2 words
+
+Extra
+ * dd - delete line, D - delete to the end of the line 
+ * cc - change line, C - change to the end of the line
+ BUT
+ * Y - copy line, yy - copy to the end of the line (might be remapped)
+
+ * . - repeat last change
+
+}}}
+{{{ Undo / redo
+
+ * u - undo last change (:undo)
+ * U - undo current line (pressed mostly accindentally)
+ * ^R - redo (:redo)
+
+Undo tree
+ 
+ * g-, g+
+ * :earlier [num/time], :later [num/time]
+ * (Mundo plugin)
+
+}}}
+{{{ Advanced navigation
+
+Marks
+ * m{a-z}, m{A-Z} - set local/global mark
+ * '{a-Z}, `{a-Z} - go to mark (first non-whitespace, exact position)
+ * marks can be used as motion (d'a - delete to mark a)
+ * '', `` - before latest jump (line, exact position)
+ * :marks - list marks
+
+Jumps
+ * :jumps - jump list
+ * ^O - previous jump
+ * ^I - next jump
+
+Changes
+ * '. - go to last change mark
+ * g, g; - next/previous change position
+ * :changes
+
+}}}
+{{{ Registers
+
+A register is a storage place for "things".
+
+ * "a..z - user registers - "A..Z - appends to the selected register
+ * "" - unnamed register (yank, change, delete fills it)
+ * "0 - default yank register (only for yank)
+ * "1..9 - delete history
+ * "_ - black hole register (seems to be useless, but if you don't want put into "" what you are deleting it might be useful)
+ * ". - last inserted text
+ * "% - current filename
+ * ": - command register (last command)
+ * "/ - search register (last search string)
+ * :reg - show registers
+
+Example
+
+ * "adtX "Add - delete everything to 'X' then delete the whole line, store all in register "a
+ * "b2P - paste the content of register "b two times before the cursor
+ * :s/^R//cica/g - replace the last search (^R have to be used in the command line instead of ") with "cica" in the current line
+
+}}}
+{{{ Macros
+
+ * qa - starts recording a macro into the given register ('a' here), pressing q again stops recording
+ * @a - executes macro from the given register
+ * @@ - repeats last macro
+ * 18@a - executes macro 18 times
+
+The macro is stored in a standard register, you can modify it by paste/change/copy. (or write a macro by hand)
+
+}}}
+{{{ Opening files
+
+ * vim file1 file2 - open file1 and file2
+ * vim file1 +123 - open file1 and go to line 123
+ * :e file - open file
+ * :split file - open file in split window
+ * :Ex - open file explorer
+ * gf - edit file whose name is under the cursor
+
+Remote locations (scp, ftp) are supported as well.
+
+}}}
+{{{ Search & replace
+
+Search
+
+ * /,? - search forward/backward
+ * n,N - next/previous occurance
+ * ggn,GN - first/last
+ * */# - search for current (exact) word forward/backward
+ * g*/g# - search for current (not exact) word forward/backward
+
+Replace
+
+ * :[range]s/{pattern}/{string}/gc
+ * range:
+   * (nothing) - this line
+   * % - whole file
+   * '<,'> - selection (automatically applied when in visual mode)
+   * 4,12 - between line 4 and 12
+ * g - every occurence in a line (only first match is replaced by default)
+ * c - confirmation required
+
+Pattern
+ * http://vimregex.com/
+
+}}}
+{{{ That's far from all
+
+ * mappings
+ * useful plugins
+ * scripts
+ * ...
+
+}}}
+
+# vim: foldmethod=marker
