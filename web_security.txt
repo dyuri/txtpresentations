@@ -62,7 +62,7 @@ JWT (JSON Web Token)
 
 #1 As plain text
 
-* we're not T-Systems :(
+* we're not T-Systems :( [https://www.hwsw.hu/hirek/57531/bkk-online-berlet-t-systems-biztonsag.html]
 * DO NOT EVER
 
 #2 As a simple hash
