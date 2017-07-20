@@ -89,9 +89,9 @@ py> crypt.crypt('nem igazi jelszo', '$1$saltsalt')
 
 #sha1
 py> crypt.crypt('nem igazi jelszo', '$5$saltsalt')
+'$5$saltsalt$YgzPiIYuBL6dqAnD1icVdvGnZRxKjm3nb.akiwHaPb3'
 
 #sha512
-'$5$saltsalt$YgzPiIYuBL6dqAnD1icVdvGnZRxKjm3nb.akiwHaPb3'
 py> crypt.crypt('nem igazi jelszo', '$6$saltsalt')
 '$6$saltsalt$5Svv7/14kYtcAMAjbHEQ/J8H.X9RyKNEh8XD2/ppt9MYH57eXgeWQ.o0RJfoovtzlJT1kVEcIDaUKyd8yL6jp1'
 ```
