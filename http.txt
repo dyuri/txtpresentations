@@ -1,0 +1,192 @@
+{{{ HTTP - HyperText Transfer Protocol
+
+- 1996 (1.0), 1999 (1.1), 2015 (2.0)
+- RFC 2616 (1.1), RFC 7540 (2.0)
+
+}}}
+
+{{{ HTTP 1.1
+
+- simple, human readable
+- request - response
+- 1st line + headers + payload
+- user agent (browser) <=> webserver
+- extensible (custom headers can be added)
+- stateless
+
+}}}
+
+{{{ Request - overview
+
+# 1st line - method + resource + version
+
+GET /index.html HTTP/1.1
+
+# headers - one per line, in "Header: header value" format
+
+Host: euedge.com
+User-Agent: browser Mozilla/5.0 egyeb hazugsagok
+Accept: text/html, text/plain;q=0.5, text/*;q=0.3
+
+# payload/body (anything that is separated from the header by 2 line breaks)
+
+Example:
+'''
+POST /api/login HTTP/1.1
+Host: akarmi.com
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 35
+
+username=cica&password=ezittajelszo
+'''
+
+}}}
+
+{{{ Request - methods
+
+- GET - to retrieve data (should not have a body)
+  - some information might be sent with the resource, but it's size is limited
+- HEAD - same as GET, but should not get the actual data, only the headers
+- POST - send data (in the body) to the server, causing state change or sideeffects on the server
+  - for example loging in
+  - adding a new entity to some resource
+- PUT - similar to POST, but usually used to change/replace entities, should be "idempotent" (repeating the request should result in the same state)
+- DELETE - to delete a resource
+- OPTIONS - set/get communication options (used for CORS for example)
+
+(CONNECT - for proxy connection, TRACE - for debugging, PATCH - partial modifications to a resource)
+
+}}}
+
+{{{ Response - overview
+
+# 1st line - version + status code + status message
+
+HTTP/1.1 200 OK
+
+# headers (same as for the request)
+
+Date: Thu, 29 Sept 2017 13:30:02 GMT
+Server: netcatba masolok
+Content-Type: text/html
+Content-Length: 12345
+
+# payload/body (same as for the request)
+
+<!DOCTYPE html><html>...
+
+}}}
+
+{{{ Response - status codes
+
+# 1xx - information
+  - 100 Continue - for cases like sending huge amount of data the client could ask for this via "Expect: 100-continue" header
+  - 101 Switching protocols - client can ask protocol switch via the "Upgrade" header (for HTTP/2 or websocet)
+# 2xx - success
+  - 200 OK
+  - 201 Created - a new resource has been created (by PUT or POST), the location of the new resource might be found in the "Location" header of the response
+  - 202 Accepted - the request was accepted, but it is still processed (in an async way)
+  - 203 Non-Authorative Information - a 200 response has been modified by a proxy for example
+  - 204 No Content
+  - 205 Reset Content
+  - 206 Partial Content - only a part of the response was sent (the client used the "Range" header)
+# 3xx - redirect
+  - 300 Multiple Choices - the resource is available in multiple instances (like format, language, ...) and the client have not used an 'Accept-*' header for example
+  - 301 Moved Permanently - the resource has been moved to the location indicated by the "Location" header - the client (browser/search engine) can update the link for that resource since this is permanent
+  - 302 Found - temporary redirection ("Location" header) - for example user is logged in in the login page successfully, redirecting her to the index page
+  - 303 See Other - usually can be a response for a POST or PUT request, but the redirect don't go to the new resource but to another page like confirmation or progress
+  - 304 Not Modified - "redirection to browser cache", if the client uses something like "If-Modified-Since" the server could reply that the resource is up-to-date in the client cache
+  - 307 Temporary Redirect - same as 302, but the method and the body won't be changed (for 302 some clients change the method to GET)
+  - 308 Permanent Redirect - same as 301 (see 307-302 relation)
+# 4xx - client error
+  - 400 Bad Request - the server could not understand the request
+  - 401 Unauthorized - client should authenticate itself to access this resource (might have a "WWW-Authenticate" header)
+  - 403 Forbidden - even with re-authentication, the client won't have access to this resource
+  - 404 Not Found - no resource is on that location
+  - 405 Method Not Allowed - method not supported for the given resource
+  - 406 Not Acceptable - the server cannot send the response in a format that the client accepts ("Accept-*" headers)
+  - 407 Proxy Authentication Required - sent by a proxy server (can have a "Proxy-Authenticate" header)
+  - 408 Request Timeout - with "Connection: close" header, the server indicates that it closes this connection
+  - 409 Conflict
+  - 410 Gone - like 404, but the server is sure that the resource was there, but it isn't anymore
+  - 411 Length Required - the client must include the "Content-Length" header
+  - 412 Precondition Failed - for non-GET/HEAD responses when for example "If-Unmodified-Since" fails
+  - 413 Payload Too Large
+  - 414 URI Too Long
+  - 415 Unsupported Media Type - "Content-Type"
+  - 416 Range Not Satisfiable - "Range"
+  - 417 Expectation Failed - "Expect"
+  - 418 I'm a teapot - actually in an RFC (April Fools' joke) - Any attempt to brew coffee with a teapot should result in the error code "418 I'm a teapot".
+  - 426 Upgrade Required - "Upgrade"
+  - 429 Too Many Requests
+  - 431 Request Header Fields Too Large
+  - 451 Unavailable For Legal Reasons
+# 5xx - server error
+  - 500 Internal Server Error - "something went wrong", unhandled exception, ...
+  - 501 Not Implemented - the request method is not implemented
+  - 502 Bad Gateway - the proxy/gateway got invalid response from the upstream server
+  - 503 Service Unavailable - the server is not yet ready (weblogic is starting up)
+  - 504 Gateway Timeout - the proxy/gateway cannot reach the upstream server
+  - 505 HTTP Version Not Supported
+  - 511 Network Authentication Required - "free wifi"
+
+}}}
+
+{{{ Cookies
+
+The server can set cookies via the 'Set-Cookie' header, that are sent back by the client in the 'Cookie' header.
+
+<name>=<value>
+
+The 'Cookie' header can have a ; separated list of cookies.
+
+# Set-Cookie
+
+One cookie per 'Set-Cookie' header, but multiple headers are allowed.
+
+# Directives
+
+- Expires=<date>
+  - the cookie expires on <date>, the client should remove it afterwards
+  - if not set, the cookie will have a lifetime of the session ("dies" when the tab is closed)
+- Max-Age=<seconds>
+  - have precedence over 'Expires'
+- Domain=<domain>
+  - if not set current domain is used (subdomains not included)
+  - if set, subdomains are included (no need for a leading .)
+- Path=<path>
+  - the root of the path for the cookie
+- Secure
+  - the cookie is only sent over secure (HTTPS) connection
+- HttpOnly
+  - not accessible via JS (document.cookie, XMLHttpRequest, Request)
+
+}}}
+
+{{{ 
+}}}
+
+{{{ 
+}}}
+
+{{{ 
+}}}
+
+{{{ 
+}}}
+
+{{{ 
+}}}
+
+TODO:
+- caching, conditional requests
+- authentication
+- connection
+- compression
+- content negotiation
+- proxy
+- security (cors, csp, hpkp, hsts)
+- websocket
+
+# vim: foldmethod=marker
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching
