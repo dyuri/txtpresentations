@@ -132,6 +132,71 @@ Content-Length: 12345
 
 }}}
 
+{{{ Connection management (HTTP/1.1)
+
+# Short lived connections
+  - establish => request -> response => close
+  - HTTP/1.0, or HTTP/1.1, if "Connection: close" header present
+  - Cons: TCP connection establishment is "slow", and cannot "warm up" (window size adjustment, etc.)
+
+# Persistent connections
+  - establish => req1 -> res1; req2 -> res2; ... => close
+  - server may use "Keep-Alive: timeout=<t>, max=<m>"
+  - HTTP/1.1 default
+  - Cons: can be used for DoS attacks
+
+# Pipelining
+  - establish => req1, req2, req3 -> res1, res2, res3 => close
+  - not enabled by major browsers
+    - lot of buggy proxies
+    - hard to implement
+    - HOL (head of line) problem
+
+Connection management is hop-by-hop (not end-to-end), related headers might be changed by a proxy.
+
+# Domain sharding (deprecated, use HTTP/2 instead)
+  - a browser opens only 6(?) parallel connections to a domain
+  - use multiple domain names for resources (like images), www1.example.com / www2.example.com / ...
+  - only if HTTP/2 is not an option
+
+}}}
+
+{{{ Proxy servers
+
+# Forward proxies
+- "gateway" for clients
+- to reduce and control bandwith used by a group (like company)
+
+# Reverse proxies
+- for the server
+- load balancing, content caching, compression, ssl termination
+
+# Headers used by proxies to forward client information
+- Via: <protocol version> <proxy host> (can be a list)
+- Forwarded: by=<proxy>; for=<client>; host=<the Host header>; proto=<http|https>
+(alternative de-facto standard versions)
+- X-Forwarded-For: <client>, <proxy1>, <proxy2>, ...
+- X-Forwarded-Host
+- X-Forwarded-Proto
+
+# HTTP tunneling
+- CONNECT method
+
+}}}
+
+{{{ Compression
+
+# End-to-end compression
+  - client: "Accept-Encoding: br, gzip"
+  - server: "Content-Encoding: gzip" + "Vary: Accept-Encoding"
+
+# Hop-by-hop compression (very rare)
+  - a proxy is involved, and the proxy (and the server) supports better compression than the client
+  - proxy1 (request): "TE: gzip, br"
+  - proxy2/server (response): "Transfer-Encoding: gzip"
+
+}}}
+
 {{{ Cookies
 
 The server can set cookies via the 'Set-Cookie' header, that are sent back by the client in the 'Cookie' header.
@@ -163,13 +228,107 @@ One cookie per 'Set-Cookie' header, but multiple headers are allowed.
 
 }}}
 
-{{{ 
+{{{ Caching
+
+# Why?
+
+Don't download files that have not been changed.
+
+# Problem
+
+Most files do change sometimes.
+Don't trust the browsers.
+
+# Cache levels
+
+- browser cache
+  - size limit
+  - easy to turn off manually
+- caching proxies, CDNs
+  - no way to turn it off
+
+# Typical cachable content
+
+- simple documents, images (GET => 200 OK)
+- permanent redirecs (GET => 301, 308)
+- some error responses (GET => 404)
+- non-GET responses, if a cache-key like header is defined
+
+# Cache-Control header
+
+- don't cache at all
+  - "no-store, no-cache, must-revalidate"
+- browser might store it (for "back" button), requests validation before using the cached copy
+  - "no-cache"
+- single user (browser) only
+  - "private"
+- can be stored in a shared cache (proxy)
+  - "public"
+- expiration / freshness
+  1. "max-age=36000" (10 hours)
+  2. "Expires" header with a date (client side date, not very reliable)
+- validation (see below) required
+  - "must-revalidate"
+
+(Pragma header is for HTTP/1.0, don't use it anymore.)
+
+# Validation
+
+- ETags
+  - "strong" validator
+  - server sends "ETag"
+  - client uses "If-None-Match" w/ etag value
+- Last-Modified
+  - "weak" validator
+  - server sends "Last-Modified" header with date
+  - client uses "If-Modified-Since" header
+
+- 304 Not Modified - sent back if something matches (w/o response body)
+- 200 OK - sent back w/ response body otherwise
+
+# Vary
+
+If the server uses the "Vary" header, the client must include the given heaeders when caching.
+For example: "Vary: User-Agent" means the response could be different for different "User-Agent" values, cache accordingly.
+
 }}}
 
-{{{ 
+{{{ HTTP authentication
+
+- 401 Unauthorized
+  - w/ WWW-Authenticate: <type> realm=<realm>
+- Client responds w/ "Authorization: <type> <credentials>" header
+
+# Auth types
+- Basic - base64 encoded credentials
+- Bearer - OAuth 2.0 token
+- Digest - md5/sha hashed credentials
+
+# USE ONLY OVER HTTPS/SSL
+- MITM attacks possible for all of them
+- attacker can get the password in case of Basic auth
+
+# Easy to use
+- supported by all major webservers
+- URLs can contain the credentials (https://username:password@www.example.com/)
+
 }}}
 
-{{{ 
+{{{ Content negotiation
+
+The client can specify some properties of the response which it prefers, using the "Accept-*" headers.
+The response should contain the "Vary" header with the "Accept-*" headers involved or might use 300 (Multiple Choices) or 406 (Not Acceptable) response status codes (their response body is not standardized).
+
+- Accept: <MIME_type>/<MIME_subtype>
+- Accept-Charset: <charset>
+- Accept-Encoding: <encoding>
+- Accept-Language: <language code>
+
+All headers above can contain a list of (optionally) weighted options.
+For example if the client prefers german, but can read english (with 0.8 priority) or hungarian (with 0.4 priority) as well, it can use:
+
+Accept-Language: en, de;q=0.8, hu;q=0.4
+
 }}}
 
 {{{ 
@@ -179,14 +338,8 @@ One cookie per 'Set-Cookie' header, but multiple headers are allowed.
 }}}
 
 TODO:
-- caching, conditional requests
-- authentication
-- connection
-- compression
-- content negotiation
-- proxy
 - security (cors, csp, hpkp, hsts)
 - websocket
+- http 2
 
 # vim: foldmethod=marker
-https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching
