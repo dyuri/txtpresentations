@@ -508,6 +508,15 @@ $ scp -r fdadmin@afonya:/opt/fddata/media ./media/
 $ rsync -avz fdadmin@afonya:/opt/fddata/media/ ./media
 
 }}}
+{{{ tmux (or screen)
+
+Terminal "multiplexer"
+- multiple shells in one terminal (like tabs)
+- can be detached/re-attached, programs are still running in the background
+- a session can be accessed from multiple terminals (and by multiple users as well)
+- you don't loose anything if network goes down
+
+}}}
 {{{ http from the console
 
 # there is 'telnet' of course ...
