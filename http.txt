@@ -331,15 +331,97 @@ Accept-Language: en, de;q=0.8, hu;q=0.4
 
 }}}
 
-{{{ 
+{{{ HTTP Security
+
+# Access control - CORS (Cross Origin Resource Sharing)
+- cross origin request: when a resource (image, css, whatever) is served from a different domain than the initiator HTML
+- same origin: the "scheme/host/port" tuple should be the same
+  - document.domain might be set to a parent/subdomain
+
+- embedding is typically allowed (with HTML tags like <script>, <link>, <img>, ...)
+- writing is allowed (redirects, form submissions, simple links)
+- reads are not allowed by default (and to prevent leaks by embedding, some properties of embedded cross-origin resources are vorbidden to read, like image pixel data)
+
+## CORS - to enable cross origin access controlled by the server for
+  - XMLHttpRequest or Fetch
+  - web fonts
+  - webgl textures
+  - image/video data drawn to canvas
+  - ...
+
+## CORS communication
+  - simple requests
+    - does not trigger CORS preflight
+    - "classic" browser initiated requests like GET, POST w/ form like content type
+    - response should contain "Access-Control-Allow-Origin" header with the initiator Origin (or '*')
+  - preflighted requests
+    - anything that isn't a simple request
+    - preflight request
+      - OPTIONS method to the request URI
+        - Access-Control-Request-* headers (-Origin, -Method, -Headers)
+    - preflight response
+      - 200 OK (or 403)
+        - Access-Control-Allow-* headers (-Origin, -Methods, -Headers)
+    - normal request-response pair after preflight
+  - CORS w/ credentials (cookies or auth tokens)
+    - XMLHttpRequest().withCredentials = true
+    - response (simple or preflight) should have the 'Access-Control-Allow-Credentials: true' header
+
+# CSP - Content Security Policy
+  - when not defined same origin policy is used
+  - 'Content-Security-Policy' HTTP header or <meta http-equiv="Content-Security-Policy" content="..."> tag
+  - prevent and/or report XSS
+  - 'Content-Security-Policy-Report-Only' - for testing/reporting (report-uri parameter should be provided)
+
+## CSP examples
+  - default-src 'self'
+  - default-src 'self' *.example.com
+  - default-src 'self'; img-src *; script-src scripts.example.com
+  - ...
+
+# HPKP - HTTP Public Key Pinning
+  - 'Public-Key-Pins(-Report-Only)' header
+  - tells the client to trust only in the given public key for this server
+  - prevents MITM attacks that uses forged certificates
+
+# HSTS - HTTP Strict Transport Security
+  - 'Strict-Transport-Security' header 'max-age', 'includeSubdomains'
+  - tells the client that it should use secure channel (HTTPS) to communicate with this server
+  - tries to prevent MITM attacks with HTTPS termination, or attacks hijacking the HTTP->HTTPS redirects
+
+# X-Content-Type-Options: nosniff
+  - if set, the client should block requests if it's a 
+    - "style" and the MIME type is not "text/css"
+    - "script" and the MIME type is not javascript like
+
+# X-Frame-Options
+  - client should accept <frame>, <iframe> or <object> sources according to this setting
+  - DENY, SAMEORIGIN, ALLOW-FROM <url>
+
+# X-XSS-Protection
+  - tries to prevent XSS
+  - no need if 'unsafe-inline' CSP policy is set
+  - options
+    - 0 - disables XSS filtering (why?)
+    - 1 - enables XSS filtering with sanitization (usually browser default)
+    - 1;mode=block - blocks page instead of satitizing the content
+    - 1;report=<uri> - sanitize and report to uri
+
 }}}
 
-{{{ 
-}}}
+{{{ HTTP/2
 
-TODO:
-- security (cors, csp, hpkp, hsts)
-- websocket
-- http 2
+- plain text -> binary
+- new connection model
+  - streams ~ connection
+  - messages ~ a request/response
+  - frames - smallest unit of communication
+- all communication is performed over a single TCP connection, with the possibility of multiple bidirectional streams
+- streams can be prioritized
+- flow control - any party can "slow down" the communication to be able process the incoming information
+- server push - send CSS/JS/fonts before the client knows about them
+- header compression - reuse headers that have not been changed (many of them)
+
+}}}
 
 # vim: foldmethod=marker
