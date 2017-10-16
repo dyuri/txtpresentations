@@ -7,13 +7,14 @@
 
 - variables
 ```
-$ export VAR=something
+$ VAR=something
 $ echo $VAR
 something
 $ unset VAR
 $ echo $VAR
 
 ```
+Use 'export VAR' to "export" the variable to sub-shells.
 
 - if/for/...
 ```
