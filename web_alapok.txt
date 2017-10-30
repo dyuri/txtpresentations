@@ -1,42 +1,47 @@
-{{{
+{{{ WEB alapok
+}}}
+{{{ Halozati retegek - OSI
 
-WEB alapok
-==========
+- Physical - drot, optika
+- Datalink - ethernet - switch
+- Network - IP - router
+- Transport - TCP, UDP - firewall/port forward
+- (Session) - (TCP)
+- (Presentation) - (gzip, ssl)
+- Application - HTTP - proxy
 
 }}}
-{{{
-
-TCP/IP
-======
+{{{ TCP/IP
 
 - IP
 - TCP
 - szerver/kliens
 
 }}}
-{{{
-
-Routing
-=======
+{{{ Routing
 
 - statikus
 - dinamikus (RIP/OSPF/...)
 - BGP
 
 }}}
-{{{
+{{{ NAT - Network Address Trasnlation
 
-N√©vfelold√°s
-===========
+- keves a (publikus, IPv4) IP cim
+- a "router" cimforditast vegez
+- hely halozatok
+  - 10.0.0.0/8
+  - 172.16.0.0/12
+  - 192.168.0.0/16
+
+}}}
+{{{ N√©vfelold√°s
 
 - gethostbyname() [nsswitch]
 - DNS
 
 }}}
-{{{
-
-HTTP (1.1)
-==========
+{{{ HTTP (1.1)
 
 [request]
 POST /ide/megy/az/adat HTTP/1.1
@@ -58,10 +63,7 @@ Server: nginx/1.7.1
 }PÌ≥ãÌ≤Ç0Ì≤ºÌ≥≥+@`Ì≤≠Ì≥ÅG<Ì≤âÌ≤ºx2+TÌ≤°mÌ≥öbÌ≤¢_oyHÌ≤º
 
 }}}
-{{{
-
-HTTPS
-=====
+{{{ HTTPS
 
 - SSL
 - certificates
@@ -69,29 +71,20 @@ HTTPS
 - [Let's Encrypt]
 
 }}}
-{{{
-
-HTTP Proxy
-==========
+{{{ HTTP Proxy
 
 - X-Forwarded-For: c, p1, p2, ...
 - NetScaler, CDN-ek
 - HTTPS?
 
 }}}
-{{{
-
-CGI/FCGI
-========
+{{{ CGI/FCGI
 
 - k√∂rnyezeti v√°ltoz√≥k, stdin/stdout
 - "fast" - bin√°ris protocol, futva marad(hat)
 
 }}}
-{{{
-
-Sk√°l√°z√≥d√°s alacsony szinten
-===========================
+{{{ Sk√°l√°z√≥d√°s alacsony szinten
 
 - Proxy (CDN-ek)
 - DNS
