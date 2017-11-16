@@ -45,7 +45,7 @@ username=cica&password=ezittajelszo
 {{{ Request - methods
 
 - GET - to retrieve data (should not have a body)
-  - some information might be sent with the resource, but it's size is limited
+  - some information might be sent with the resource - as query parameters - but it's size is limited
 - HEAD - same as GET, but should not get the actual data, only the headers
 - POST - send data (in the body) to the server, causing state change or sideeffects on the server
   - for example loging in
@@ -81,7 +81,7 @@ Content-Length: 12345
 
 # 1xx - information
   - 100 Continue - for cases like sending huge amount of data the client could ask for this via "Expect: 100-continue" header
-  - 101 Switching protocols - client can ask protocol switch via the "Upgrade" header (for HTTP/2 or websocet)
+  - 101 Switching protocols - client can ask protocol switch via the "Upgrade" header (for HTTP/2 or websocket)
 # 2xx - success
   - 200 OK
   - 201 Created - a new resource has been created (by PUT or POST), the location of the new resource might be found in the "Location" header of the response
@@ -93,7 +93,7 @@ Content-Length: 12345
 # 3xx - redirect
   - 300 Multiple Choices - the resource is available in multiple instances (like format, language, ...) and the client have not used an 'Accept-*' header for example
   - 301 Moved Permanently - the resource has been moved to the location indicated by the "Location" header - the client (browser/search engine) can update the link for that resource since this is permanent
-  - 302 Found - temporary redirection ("Location" header) - for example user is logged in in the login page successfully, redirecting her to the index page
+  - 302 Found - temporary redirection ("Location" header) - for example user is logged in in the login page successfully, redirecting to the index page
   - 303 See Other - usually can be a response for a POST or PUT request, but the redirect don't go to the new resource but to another page like confirmation or progress
   - 304 Not Modified - "redirection to browser cache", if the client uses something like "If-Modified-Since" the server could reply that the resource is up-to-date in the client cache
   - 307 Temporary Redirect - same as 302, but the method and the body won't be changed (for 302 some clients change the method to GET)
@@ -137,7 +137,7 @@ Content-Length: 12345
 # Short lived connections
   - establish => request -> response => close
   - HTTP/1.0, or HTTP/1.1, if "Connection: close" header present
-  - Cons: TCP connection establishment is "slow", and cannot "warm up" (window size adjustment, etc.)
+  - Cons: TCP connection establishment is "slow", and cannot "warm up" (window size adjustment, etc.)*
 
 # Persistent connections
   - establish => req1 -> res1; req2 -> res2; ... => close
@@ -158,6 +158,18 @@ Connection management is hop-by-hop (not end-to-end), related headers might be c
   - a browser opens only 6(?) parallel connections to a domain
   - use multiple domain names for resources (like images), www1.example.com / www2.example.com / ...
   - only if HTTP/2 is not an option
+
+* [[[
+Example RTT:
+- Bp(EUE) <=> BIX: ~2ms
+- Bp(EUE) <=> Ireland(AWS): ~20ms
+- Bp(EUE) <=> NYC(FD): ~100ms
+
+Connection establishment (TCP) takes ~RTT*2 time.
+Even using an AWS like CDN establishing a single TCP connection takes the same time (~40ms) as downloading 100kb data on an average 3G connection. 
+  
+QUIC - Quick UDP Internet Connections - uses UDP instead of TCP, "no" connection establishment, custom packet loss handling, much better for streaming content.
+]]]
 
 }}}
 
@@ -201,7 +213,7 @@ Connection management is hop-by-hop (not end-to-end), related headers might be c
 
 The server can set cookies via the 'Set-Cookie' header, that are sent back by the client in the 'Cookie' header.
 
-<name>=<value>
+<name>=<value>; [directives separated by ;]
 
 The 'Cookie' header can have a ; separated list of cookies.
 
@@ -419,7 +431,7 @@ Accept-Language: en, de;q=0.8, hu;q=0.4
 - all communication is performed over a single TCP connection, with the possibility of multiple bidirectional streams
 - streams can be prioritized
 - flow control - any party can "slow down" the communication to be able process the incoming information
-- server push - send CSS/JS/fonts before the client knows about them
+- server push - send CSS/JS/fonts before the client knows about them [buggy ATM in ~ every browser - link[rel=preload] is more reliable]
 - header compression - reuse headers that have not been changed (many of them)
 
 }}}
