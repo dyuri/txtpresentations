@@ -1,0 +1,61 @@
+{{{ Time series databases
+}}}
+
+{{{ Why do we want to use one?
+
+- optimized for handling time series data (like measurements)
+- classic DBs are usually not really good at this
+
+}}}
+
+{{{ rrdtool
+
+- since 1999, for storing monitoring data (Munin)
+- fix database (file) size
+- data can be stored in multiple precision (~retention)
+- still in development
+- bindings for lot of languages
+
+}}}
+
+{{{ whisper / Graphite
+
+- since 2008, part of Graphite monitoring software
+- very similar to rrd, but
+  - can take updates prior to the most recent update (for network outages)
+  - handles irregular updates much better
+- easy to use API if used with Carbon (part of Graphite as well)
+
+- alternative implementation: go-carbon
+
+}}}
+
+{{{ OpenTSDB
+
+- since ~2013
+- on top of Hadoop + HBase
+- no retention (keep raw data forever)
+- ms precision
+- highly scalable, millions of writes per sec
+
+}}}
+
+{{{ InfluxDB / TICK
+
+- since 2015, IoT optimized, with commercial version (and support)
+- OS (Telegraf, InfluxDB, Chronograf, Kapacitor ~ Graphite) + Commercial (Clustering, Cloud, ...)
+- Configurable retention, "continous queries"
+- SQL like queries
+
+}}}
+
+{{{ Displaying time series data - Grafana
+
+- OS w/ commercial cloud and support
+- lot of widgets
+- lot of available datasources (Graphite, OpenTSDB, InfluxDB; MySQL, Postgres ...)
+- easy to configure and create beautyful dashboards
+
+}}}
+
+# vim: foldmethod=marker
