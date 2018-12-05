@@ -43,5 +43,27 @@ Examples:
 * request pre- or response postprocessing
 
 }}}
+{{{ ASGI
+
+- from Django Channels
+- no PEP (yet?)
+- https://asgi.readthedocs.io/
+- protocol server + application
+- events (like `http.request` or `websocket.receive`)
+- applications: asyncio compatible coroutines
+- middleware support
+- wsgi "compatible" - wsgi apps can be easily converted into asgi apps  
+
+Servers
+- Daphne - "reference server", Twisted (Django Channels)
+- Uvicorn - uvloop
+- Hypercorn - hyper (h11, h2, wsproto)
+
+Frameworks
+- Django Channels
+- Quart - Flask "inspired"
+- Responder
+
+}}}
 
 # vim: foldmethod=marker
