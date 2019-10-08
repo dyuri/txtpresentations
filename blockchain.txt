@@ -1,0 +1,105 @@
+{{{ Mini Blockchain "What?"
+
+  - buzzword
+  - solution to "all the thingz"
+  - BitCoin, Ethereum
+
+}}}
+{{{ What is a blockchain?
+
+  - list of records that are crypthographically linked
+  - add only, resistant to modification
+  - a block: timestamp, hash, hash of previous block, [data*]
+
+Usually (but not necessarily):
+  - managed by public, peer-to-peer networks
+  - data is some kind of transaction (for cryptocurrencies especially)
+  - a financial transaction has multiple parts (-1 here is +1 there), so multiple chunks of data should be stored in one block
+    - most cases this is done via Merkle tree (hash tree)
+
+}}}
+{{{ Cryptographic hash functions
+
+A mathematical algorithm that maps arbitrary data to a fixed size string (number). Therefore it's a one-way function, "impossible" to invert.
+
+  - deterministic
+  - "quick" to compute
+  - very hard to invert (brute-force, rainbow tables)
+  - very hard to find two inputs with the same hash (collision)
+  - small change in the input should change the output extensively
+
+Usage:
+
+  - [fast] integrity verification (files, documents, ...)
+  - digital signature
+  - [slow] passwords
+  - [slow] proof-of-work
+  - identifiers - i.e. in p2p networks, VCSs
+
+Examples:
+
+  [✗] md5 (128bit) - easy to collide
+  [✗] sha1 (160bit) - not that easy to collide, but there is a better way than brute-force (~2^63)
+  [✓] bcrypt (128bit salt + 184bit hash) - for passwords, integrated salting (protect against rainbow tables, and slows down brute-force), maximized input size
+  [✓] sha2 (224, 256, 384, 512 bits) - seems OK, commonly called as sha256 (and so on)
+  [✓] sha3 - more modern, quicker algorithm than sha2, in the same sizes
+  [✓] scrypt - key derivation function (pseudo-random), very slow, requires memory - hard to perform hardware attacks (like GPU); for passwords and PoW
+  ...
+
+}}}
+{{{ Minimal blockchain
+
+  - a block: timestamp, hash, previous hash, data
+  - hash is calculated from at least [timestamp, previous hash, data]
+  - starts with a "genesis block"
+  - breaks if
+    - hash of previous block != previous hash
+    - stored hash != calculated hash
+    - timestamp < timestamp of previous hash
+
+}}}
+{{{ Merkle tree
+
+A transactions consists of multiple changes, but should be stored "atomic".
+
+  - every non-leaf nodes are labelled with the hash of the child nodes
+  - if the root of the tree can be trusted (e.g. stored in a blockchain) than the whole transaction can be easyli verified
+
+Usage: BitCoin, Ethereum, BitTorrent (integrity of multiple files)
+
+}}}
+{{{ Example
+
+https://github.com/dyuri/repachain
+
+>>> from repachain import RepaChain
+>>> chain = RepaChain('00', 'sha256')
+>>> chain.add_block('alma')
+>>> chain.add_block('beka')
+>>> for block in chain:
+...   print(block.as_dict())
+{'index': 0, 'timestamp': 1570529994.073269, 'data': '{"algorithm": "sha256", "hashending": "00", "version": "1.0.0"}', 'previous_hash': 'arbitrary', 'nonce': 345, 'hash': '...ab7a65a3ca0b2bca184f5400'}
+{'index': 1, 'timestamp': 1570530000.35255, 'data': 'alma', 'previous_hash': '...ab7a65a3ca0b2bca184f5400', 'nonce': 96, 'hash': '...a2b4da79d4de5ca98a33eb00'}
+{'index': 2, 'timestamp': 1570530002.76873, 'data': 'beka', 'previous_hash': '...a2b4da79d4de5ca98a33eb00', 'nonce': 97, 'hash': '...9bbf4175c7626eb601e95800'}
+>>> chain.verify()
+True
+>>> chain[1].data = 'cica'
+>>> chain.verify()
+repachain.InvalidBlockException: Wrong hash at block 1
+
+### PoW (10*100 long chain creation, alg / 'hash ending')
+```
+testcase sha256 / '': 0.019202158087864518
+testcase sha3_512 / '': 0.006655497942119837
+testcase scrypt / '': 34.93714159098454
+testcase sha256 / 'a': 0.06327558902557939
+testcase sha3_512 / 'a': 0.07444667094387114
+testcase scrypt / 'a': 576.2741245139623
+testcase sha256 / 'abc': 14.577179565094411
+testcase sha3_512 / 'abc': 17.03659783198964
+testcase scrypt / 'abc': LOL, ain't nobody got time for that
+```
+
+}}}
+
+# vim: foldmethod=marker
