@@ -63,7 +63,7 @@ Examples:
 A transactions consists of multiple changes, but should be stored "atomic".
 
   - every non-leaf nodes are labelled with the hash of the child nodes
-  - if the root of the tree can be trusted (e.g. stored in a blockchain) than the whole transaction can be easyli verified
+  - if the root of the tree can be trusted (e.g. stored in a blockchain) than the whole transaction can be easily verified
 
 Usage: BitCoin, Ethereum, BitTorrent (integrity of multiple files)
 
