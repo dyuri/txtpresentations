@@ -53,3 +53,27 @@ const { whatever } = await import("foobar.js"); // variables can be used
 
 whatever("hello");
 ```
+
+## Loading CSS
+
+Basically the same way:
+
+```javascript
+function loadCSS(path, cb) {
+  const link = document.createElement("link");
+  link.href = path;
+  link.type = "text/css";
+  link.rel = "stylesheet";
+  link.onload(cb);
+  
+  document.head.appendChild(link);
+}
+
+loadCSS("/css/whatever.css");
+```
+
+### ...from CSS
+
+```css
+@import "./whatever.css";
+```
