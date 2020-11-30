@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Web Component demo</title>
+  <style>
+    /* still a draft */
+    cs-demo::part(star) {
+      font-size: 2em;
+    }
+  </style>
+</head>
+<body>
+  <template id="cs-demo-template">
+    <style>
+      .star {
+        display: none;
+      }
+
+      :host([rating]) .star {
+        display: inline;
+      }
+
+      :host([rating="1"]) .star[rating="2"],
+      :host([rating="1"]) .star[rating="3"],
+      :host([rating="1"]) .star[rating="4"],
+      :host([rating="1"]) .star[rating="5"] {
+        opacity: .5;
+        filter: saturate(.1);
+      }
+      :host([rating="2"]) .star[rating="3"],
+      :host([rating="2"]) .star[rating="4"],
+      :host([rating="2"]) .star[rating="5"] {
+        opacity: .5;
+        filter: saturate(.1);
+      }
+      :host([rating="3"]) .star[rating="4"],
+      :host([rating="3"]) .star[rating="5"] {
+        opacity: .5;
+        filter: saturate(.1);
+      }
+
+      :host([rating="4"]) .star[rating="5"] {
+        opacity: .5;
+        filter: saturate(.1);
+      }
+    </style>
+    <div>
+      <slot>Rating</slot>
+      <span part="star" class="star" rating="1">⭐</span>
+      <span part="star" class="star" rating="2">⭐</span>
+      <span part="star" class="star" rating="3">⭐</span>
+      <span part="star" class="star" rating="4">⭐</span>
+      <span part="star" class="star" rating="5">⭐</span>
+    </div>
+  </template>
+
+  <h1>Web Component demo</h1>
+  <cs-demo></cs-demo>
+  <cs-demo rating="4"><b>Répa</b></cs-demo>
+  <script type="module" src="./webcomponent-demo.js"></script>
+  <script>
+    document.addEventListener("click", e => {
+      console.debug("CLICK", e.target);
+    });
+  </script>
+</body>
+</html>
