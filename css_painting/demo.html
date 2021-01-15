@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Paint demo</title>
+  <script>
+    CSS.paintWorklet.addModule('demoWorklet.js');
+  </script>
+  <style>
+    .fancy {
+      background-image: paint(demoCircle), paint(headerHighlight, 0);
+    }
+    .redhl {
+      --hlColor: red;
+    }
+    .container {
+      display: flex;
+      min-height: 200px;
+    }
+    .container > div {
+      flex: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div>Not fancy div.</div>
+    <div class="fancy">Fancy div</div>
+  </div>
+  <textarea class="fancy redhl">Fancy textarea</textarea>
+</body>
+</html>
