@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Responsive example 1</title>
+<style>
+  .child {
+    background: rebeccapurple;
+    color: white;
+    padding: 1em;
+    font-size: 18px;
+    flex: 1;
+    min-width: 250px;
+  }
+  .container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1em;
+    padding: 1em;
+    border: 1px solid violet;
+  }
+  #cnt2 {
+    margin-top: 2em;
+    width: 50%;
+  }
+</style>
+</head>
+<body>
+  <div class="container" id="cnt1">
+    <div class="child child1">
+      Lorem ipsum dolor sit amet consectetur adipisicing elit. Ex, enim!
+    </div>
+    <div class="child child2">
+      Lorem ipsum Lorem ipsum dolor sit amet consectetur, adipisicing elit. Laudantium aliquid esse fugiat!
+    </div>
+    <div class="child child3">
+      consectetur adipisicing elit. Tempora totam, eos rerum ipsum consequuntur suscipit?
+    </div>
+  </div>
+  <div class="container" id="cnt2">
+    <div class="child child1">
+      Lorem ipsum dolor sit amet consectetur adipisicing elit. Ex, enim!
+    </div>
+    <div class="child child2">
+      Lorem ipsum Lorem ipsum dolor sit amet consectetur, adipisicing elit. Laudantium aliquid esse fugiat!
+    </div>
+    <div class="child child3">
+      consectetur adipisicing elit. Tempora totam, eos rerum ipsum consequuntur suscipit?
+    </div>
+  </div>
+</body>
+</html>
