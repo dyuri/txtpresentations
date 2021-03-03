@@ -75,9 +75,8 @@ But carefully, you can speed things up but also slow them down, there's no ultim
 - static pages are generated via CMS content
 - customer (cart, ordering) related stuff are handled via lightweight JS app + API calls
 
+## Web components
 
+Currently web components don't have a declarative API (in progress though), you need JS running in the browser to make them work, and even have the shadow DOM filled with something, so they cannot be rendered directly in the backend.
 
-**TODO**
-
-- hol mihez fer hozza (adat, eroforras)
-- webcomponents?
+This is why we don't use "pure" web components in FreshKick, but `fd-widgets` that might have something in their "normal" DOM, styled via classic CSS, and rendered on the backend via Soy. If they don't need to be rendered in the backend, they can use shadow DOM and all it's fancy things too.
