@@ -32,4 +32,4 @@ And in most cases higher "entropy" is more pleasant to the eyes.
 - more complex graphics => more time, BUT you *need* to set the color of all the pixels anyway
 - **very** easy to do in a parallel way
 
-Live demo: https://www.shadertoy.com/view/Nt2GDW
+[Live demo](https://www.shadertoy.com/view/Nt2GDW)
