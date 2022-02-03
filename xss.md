@@ -132,7 +132,7 @@ input.pincode[value="1234"] {
 
 #### URL parameters
 
-URLencode everthing that goes into URL parameter.
+URLencode everything that goes into URL parameter.
 
 ```jsp
 <a href="/search.jsp?page=2&searchParam=<%= URLENCODE_THIS %>">Search page 2</a>
