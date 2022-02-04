@@ -15,9 +15,7 @@ Imagine calling it via `http://whatever/search.jsp?searchParam=<script>alert(doc
 **What to do?**
 
 - *Remove the `<script>` tags!* - `<scrIpt>` works as well
-
 - Use regexp like `/[sS][cC][rR][iI][pP][tT]/` - `<img src=javascript:alert(1)>`
-
 - *remove `javascript:`* - `<img src=jav&#x41;script:alert(1)>`
 - *HTML decode, THEN remove* - `<img src=nonexistent onerror=alert(1)>`
 
