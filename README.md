@@ -5,4 +5,5 @@
 - [Cellular Noise](cellular_noise/cellular_noise.md)
 - [Python type hints](python/typing/type_hints.md)
 - [GPG](gpg.md)
-- [Cross Site Scripting](xss.md)
+- [Cross-Site Scripting](xss.md)
+- [Cross-Site Request Forgery](csrf.md)
