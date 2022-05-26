@@ -17,22 +17,96 @@
 ## Why?
 
 - mascot: **go**pher
-
 - started by **Go**ogle in 2007
-
 - focusing on multicored/networked problems
-
 - efficient (like C)
-
 - readable & usable (like Python)
-
 - high performance networking & multiprocessing
-
 - primary motivation: dislike of C++ :)
 
 ## How?
 
 Play with it: [Go Playground](https://go.dev/play/)
+
+### Flow control
+
+#### for
+
+Classic:
+
+```go
+for i := 0; i < 10; i++ {
+    fmt.Println(i)
+}
+```
+
+*While*:
+
+```go
+sum := 0
+for sum < 100 {
+    sum += 1
+}
+```
+
+Endless loop:
+
+```go
+for {
+    // neverending story
+}
+```
+
+#### if
+
+```go
+if i < 10 {
+    // i < 10
+} else {
+    // i >= 10
+}
+```
+
+W/ short statement:
+
+```go
+if s := math.Sin(f); s < .5 {
+    return s
+}
+// s isn't defined here
+```
+
+#### switch
+
+Basically many `if`s, no silly `break`s and such:
+
+```go
+switch os := runtime.GOOS; os {
+case "darwin":
+    // MacOS
+case "linux":
+    // Linux
+default:
+    // anything else
+}
+```
+
+#### defer
+
+Defers execution until the function returns (~finally).
+
+```go
+func x(i) {
+    defer fmt.Println("x exited")
+
+    if i > 10 {
+        return "big"
+    }
+    return "small"
+}
+```
+
+Deferred functions are stacked, called in a reverse order.
 
 ### Types
 
@@ -41,11 +115,8 @@ No variable is *uninitialized*.
 #### Basic types, zero values
 
 - bool (false)
-
 - numbers (byte, uint8, int16, float32, complex128, ...) (0)
-
 - string ("")
-
 - rune (int32 - unicode character) ('')
 
 Inference:
@@ -101,13 +172,9 @@ nums3 := []int{5,4,3,2,1} // nums3 is a slice, the underlying array is hidder
 ```
 
 - length - current size of the view
-
 - capacity - the size of the underlying array
-
 - `make()` - create slice with the given length/capacity
-
 - `append()`- *smart* append, increases capacity when required
-
 - `range` - for iterating through iterables
 
 ```go
@@ -234,7 +301,7 @@ func PrintAbs(a Abser) {
     if ok {
         // handle float
     }
-    
+
     // OR
 
     switch v := i.(type) {
