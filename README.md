@@ -7,3 +7,4 @@
 - [GPG](gpg.md)
 - [Cross-Site Scripting](xss.md)
 - [Cross-Site Request Forgery](csrf.md)
+- [Go Basics](golang/golang.md)
