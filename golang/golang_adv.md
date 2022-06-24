@@ -42,12 +42,12 @@ func sum(s []int, c chan int) {
 
 func main() {
     s := []int{1, 2, 3, 4, 5, 6, 7, 8}
-    
+
     c := make(chan int)
     go sum(s[:len(s)/2], c)
     go sum(s[len(s)/2:], c)
     x, y := <-c, <-c // receive two values through c
-    
+
     fmt.Println(x+y)
 }
 ```
@@ -131,10 +131,57 @@ default:
 
 The `sync` module contains various synchronization primitives to synchronize goroutines, like `sync.Mutex`, `sync.WaitGroup`, ...
 
-
-
 ## Generics
 
-TODO...
+Very recent in go (1.18), pretty much what you expect.
+
+- type parameters for functions and types
+
+- interface types as sets of types
+
+- type inference
+
+```go
+func min(x, y float64) float64
+    if x < y {
+        return x
+    }
+    return y
+}
+// we need different function for int, int8, int32, ... :(
+import "golang.org/x/exp/constraints"
+
+func gmin[T contraints.Ordered](x, y T) T {
+    if x < y {
+        return x
+    }
+    return y
+}
+
+mixy := gmin[int](2, 3)
+mfxy := gmin[float64](8.3, 12.7)
+// you can create type specific functions from generic ones
+minString := gmin[string]
+// type inference
+mfxy2 := gmin(1.1, 2.2) // float64
+```
+
+#### Type sets
+
+Interfaces can now match not just for method sets, but for types too:
+
+```go
+type Ordered interface {
+    Integer|Float|~string
+}
+```
+
+- `~` means the underlying type (so `type MyString string` will match)
+
+- 
+
+`any` added for the short version of `interface{}`
+
+
 
 
