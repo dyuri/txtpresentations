@@ -19,7 +19,7 @@ The program is terminated when the main goroutine finishes.
 Go `channel`s are typed *channels* through which you can send and receive values.
 
 ```go
-ich := make(chan int)
+ch := make(chan int)
 // sending
 ch <- 12
 // receiving
@@ -92,27 +92,27 @@ if ok != nil {
 The `select` statement lets you wait on multiple channels. It blocks until one of it cases can run, then executes that one (chooses randomly if there are more).
 
 ```go
-func fibo2(c chan int, quit chan bool) {
+func fibo2(ch chan int, q chan bool) {
     x, y := 0, 1
     for {
         select {
-        case c <- x: // send if you can
+        case ch <- x: // send if you can
             x, y = y, y + x
-        case <-quit: // quit if you're asked to
+        case <- q: // quit if you're asked to
             fmt.Println("csá")
         }
     }
 }
 
 
-ch := make(chan int)
-q := make(chan bool)
+c := make(chan int)
+quit := make(chan bool)
 go func() {
     for i := 0; i < 10; i++ {
         fmt.Println(<-c)
     }
     quit <- true
-}
+}()
 fibo2(c, quit)
 ```
 
@@ -181,7 +181,3 @@ type Ordered interface {
 - 
 
 `any` added for the short version of `interface{}`
-
-
-
-
