@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+</head>
+<body>
+  <h1>Form data</h1>
+  <pre id="result">{{.}}</pre>
+  <h2>No JS</h2>
+
+  <h3>Default post</h3>
+  <form method="POST">
+    <input type="text" name="name" value="John">
+    <input type="text" name="age" value="25">
+    <input type="submit" value="Submit">
+  </form>
+
+  <h3>Plain text <small>(don't use this)</small></h3>
+  <form method="POST" enctype="text/plain">
+    <input type="text" name="name" value="John">
+    <input type="text" name="age" value="25">
+    <input type="submit" value="Submit">
+  </form>
+
+  <h3>Multipart</h3>
+  <form method="POST" enctype="multipart/form-data">
+    <input type="text" name="name" value="John">
+    <input type="text" name="age" value="25">
+    <input type="submit" value="Submit">
+  </form>
+
+  <h3>Multipart w/ file</h3>
+  <form method="POST" enctype="multipart/form-data">
+    <input type="text" name="name" value="John">
+    <input type="text" name="age" value="25">
+    <input type="file" name="image">
+    <input type="submit" value="Submit">
+  </form>
+
+  <h2>JS</h2>
+
+  <h3>FormData</h3>
+
+  <form id="jsform1">
+    <input type="text" name="name" value="John">
+    <input type="text" name="age" value="25">
+    <input type="submit" value="Submit">
+  </form>
+  <script>
+    var form = document.getElementById('jsform1');
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      var data = new FormData(form);
+      fetch('/api', {
+        method: 'POST',
+        body: data
+      }).then(function(response) {
+        return response.text();
+      }).then(function(text) {
+        document.getElementById('result').textContent = text;
+      });
+    });
+  </script>
+
+  <h3>URLSearchParams</h3>
+
+  <form id="jsform2">
+    <input type="text" name="name" value="John">
+    <input type="text" name="age" value="25">
+    <input type="submit" value="Submit">
+  </form>
+  <script>
+    var form = document.getElementById('jsform2');
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      var formdata = new FormData(form);
+      var data = new URLSearchParams(formdata);
+      fetch('/api', {
+        method: 'POST',
+        body: data
+      }).then(function(response) {
+        return response.text();
+      }).then(function(text) {
+        document.getElementById('result').textContent = text;
+      });
+    });
+  </script>
+
+  <h3>JSON</h3>
+
+  <form id="jsform3">
+    <input type="text" name="name" value="John">
+    <input type="text" name="age" value="25">
+    <input type="submit" value="Submit">
+  </form>
+  <script>
+    var form = document.getElementById('jsform3');
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      var formdata = new FormData(form);
+      var plaindata = Object.fromEntries(formdata.entries());
+      var data = JSON.stringify(plaindata);
+      fetch('/api', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: data
+      }).then(function(response) {
+        return response.text();
+      }).then(function(text) {
+        document.getElementById('result').textContent = text;
+      });
+    });
+  </script>
+
+  <h3>FormData w/ file</h3>
+
+  <form id="jsform4">
+    <input type="text" name="name" value="John">
+    <input type="text" name="age" value="25">
+    <input type="file" name="image">
+    <input type="submit" value="Submit">
+  </form>
+  <script>
+    var form = document.getElementById('jsform4');
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      var data = new FormData(form);
+      fetch('/api', {
+        method: 'POST',
+        body: data
+      }).then(function(response) {
+        return response.text();
+      }).then(function(text) {
+        document.getElementById('result').textContent = text;
+      });
+    });
+  </script>
+
+  TODO:
+  - extra fields (like Blob)
+  - dataurl
+
+</body>
+</html>
