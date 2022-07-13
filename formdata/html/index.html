@@ -2,7 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title></title>
+  <title>Form data examples</title>
+  <style>
+    #mandel {
+      width: 400px;
+      height: 300px;
+      position: fixed;
+      top: 0;
+      right: 0;
+      image-rendering: pixelated;
+    }
+  </style>
 </head>
 <body>
   <h1>Form data</h1>
@@ -139,9 +149,123 @@
     });
   </script>
 
-  TODO:
-  - extra fields (like Blob)
-  - dataurl
+  <h3>FormData w/ dataurl</h3>
+
+  <form id="jsform5">
+    <input type="text" name="name" value="John">
+    <input type="text" name="age" value="25">
+    <select name="type">
+      <option>image/png</option>
+      <option>image/jpeg</option>
+      <option>image/whatever</option>
+    </select>
+    <input type="submit" value="Submit">
+  </form>
+  <script>
+    var form = document.getElementById('jsform5');
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      var data = new FormData(form);
+      data.append('image', getMandelasDataURL(form.type.value));
+      fetch('/api', {
+        method: 'POST',
+        body: data
+      }).then(function(response) {
+        return response.text();
+      }).then(function(text) {
+        document.getElementById('result').textContent = text;
+      });
+    });
+  </script>
+
+  <h3>FormData w/ blob</h3>
+
+  <form id="jsform6">
+    <input type="text" name="name" value="John">
+    <input type="text" name="age" value="25">
+    <select name="type">
+      <option>image/png</option>
+      <option>image/jpeg</option>
+      <option>image/whatever</option>
+    </select>
+    <input type="submit" value="Submit">
+  </form>
+  <script>
+    var form = document.getElementById('jsform6');
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var data = new FormData(form);
+      data.append('image', await getMandelasBlob(form.type.value));
+      fetch('/api', {
+        method: 'POST',
+        body: data
+      }).then(function(response) {
+        return response.text();
+      }).then(function(text) {
+        document.getElementById('result').textContent = text;
+      });
+    });
+  </script>
+
+<canvas id="mandel"></canvas>
+<script>
+// mandelbrot example
+var canvas = document.getElementById('mandel');
+var ctx = canvas.getContext('2d');
+
+const WIDTH = 40;
+const HEIGHT = 30;
+ctx.canvas.width = WIDTH;
+ctx.canvas.height = HEIGHT;
+
+const REAL_SET = { start: -2, end: 1 };
+const IMAGINARY_SET = { start: -1, end: 1 };
+const MAX_ITERATION = 80;
+
+const colors = new Array(16).fill(0).map((_, i) => i === 0 ? '#000' : `#${Math.floor(i / 4).toString(16) + Math.floor(i / 1).toString(16) + Math.floor(i / 2).toString(16)}`);
+
+function mandelbrot(c) {
+  let z = { x: 0, y: 0 }, n = 0, p, d;
+  do {
+    p = {
+      x: Math.pow(z.x, 2) - Math.pow(z.y, 2),
+      y: 2 * z.x * z.y
+    };
+    z = {
+      x: p.x + c.x,
+      y: p.y + c.y
+    };
+    d = Math.sqrt(Math.pow(z.x, 2) + Math.pow(z.y, 2));
+    n += 1;
+  } while (d <= 2 && n < MAX_ITERATION);
+  return [n, d <= 2];
+}
+
+function draw() {
+  for (let i = 0; i < WIDTH; i++) {
+    for (let j = 0; j < HEIGHT; j++) {
+      let complex = {
+        x: REAL_SET.start + (i / WIDTH) * (REAL_SET.end - REAL_SET.start),
+        y: IMAGINARY_SET.start + (j / HEIGHT) * (IMAGINARY_SET.end - IMAGINARY_SET.start)
+      };
+
+      const [m, isMandelbrotSet] = mandelbrot(complex);
+      ctx.fillStyle = colors[isMandelbrotSet ? 0 : (m % colors.length - 1) + 1];
+      ctx.fillRect(i, j, 1, 1);
+    }
+  }
+}
+
+function getMandelasDataURL(type) {
+  return canvas.toDataURL(type);
+}
+
+async function getMandelasBlob(type) {
+  return await new Promise(res => canvas.toBlob(res, type));
+}
+
+draw();
+</script>
 
 </body>
 </html>
