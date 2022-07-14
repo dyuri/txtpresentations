@@ -11,6 +11,10 @@ How form data can get from the browser to the backend.
   - `multipart/form-data` - multipart data, required for file uploads
   - `text/plain` - for debugging, don't use, security issues
 
+> Sidenote - MIME
+> MIME: Multipurpose Internet Mail Extensions
+> So mime types were basically invented for e-mails.
+
 ## With JS
 
 `FormData` API - serializes form data for `fetch()` or `XMLHttpRequest.send()`
@@ -56,4 +60,22 @@ fetch("/api/posthere", {
 });
 ```
 
-# TODO: toDataURL, toBlob
+An image (or any other file) is basically binary data. We can embed binary data (almost) freely in a `multipart/form-data` message, but if we want to we can encode them somehow to be easily embedded into something that can handle only "strings" - like JSON. We might invent such an encoding, but fortunatelly there's already one standardized: the *data URL scheme*.
+
+### Data URLs
+
+`data:[<mediatype>][;base64],<data>`
+
+- `data:` is the protocol (like `http:`)
+- `mediatype` is the MIME type with charset and such (like `image/png` or `text/html;charset=utf-8`)
+- `base64` means base64 encoding is used, if it's omitted, standard URL encoding should be used (`space` is `%20` for example)
+
+The result is a URL, that can be used as a standard ASCII string, in a JSON message for example.
+
+### ... adding *anything* to FormData
+
+```javascript
+formdata.append("image", data[, "filename.ext"]);
+```
+
+Data can be read from a canvas (`canvas.toDataURL()`, `canvas.toBlob()`), using the File API, or just by creating `Blob`s.

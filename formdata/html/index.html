@@ -166,7 +166,7 @@
     form.addEventListener('submit', function(e) {
       e.preventDefault();
       var data = new FormData(form);
-      data.append('image', getMandelasDataURL(form.type.value));
+      data.append('image', getMandelasDataURL(form.type.value), 'mandel.brot');
       fetch('/api', {
         method: 'POST',
         body: data
@@ -195,7 +195,7 @@
     form.addEventListener('submit', async function(e) {
       e.preventDefault();
       var data = new FormData(form);
-      data.append('image', await getMandelasBlob(form.type.value));
+      data.append('image', await getMandelasBlob(form.type.value), 'mandel.brot');
       fetch('/api', {
         method: 'POST',
         body: data
