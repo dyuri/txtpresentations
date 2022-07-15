@@ -58,10 +58,10 @@
     <input type="submit" value="Submit">
   </form>
   <script>
-    var form = document.getElementById('jsform1');
-    form.addEventListener('submit', function(e) {
+    let form1 = document.getElementById('jsform1');
+    form1.addEventListener('submit', function(e) {
       e.preventDefault();
-      var data = new FormData(form);
+      let data = new FormData(form1);
       fetch('/api', {
         method: 'POST',
         body: data
@@ -81,11 +81,11 @@
     <input type="submit" value="Submit">
   </form>
   <script>
-    var form = document.getElementById('jsform2');
-    form.addEventListener('submit', function(e) {
+    let form2 = document.getElementById('jsform2');
+    form2.addEventListener('submit', function(e) {
       e.preventDefault();
-      var formdata = new FormData(form);
-      var data = new URLSearchParams(formdata);
+      let formdata = new FormData(form2);
+      let data = new URLSearchParams(formdata);
       fetch('/api', {
         method: 'POST',
         body: data
@@ -105,12 +105,12 @@
     <input type="submit" value="Submit">
   </form>
   <script>
-    var form = document.getElementById('jsform3');
-    form.addEventListener('submit', function(e) {
+    let form3 = document.getElementById('jsform3');
+    form3.addEventListener('submit', function(e) {
       e.preventDefault();
-      var formdata = new FormData(form);
-      var plaindata = Object.fromEntries(formdata.entries());
-      var data = JSON.stringify(plaindata);
+      let formdata = new FormData(form3);
+      let plaindata = Object.fromEntries(formdata.entries());
+      let data = JSON.stringify(plaindata);
       fetch('/api', {
         method: 'POST',
         headers: {
@@ -134,10 +134,10 @@
     <input type="submit" value="Submit">
   </form>
   <script>
-    var form = document.getElementById('jsform4');
-    form.addEventListener('submit', function(e) {
+    let form4 = document.getElementById('jsform4');
+    form4.addEventListener('submit', function(e) {
       e.preventDefault();
-      var data = new FormData(form);
+      let data = new FormData(form4);
       fetch('/api', {
         method: 'POST',
         body: data
@@ -154,7 +154,7 @@
   <form id="jsform5">
     <input type="text" name="name" value="John">
     <input type="text" name="age" value="25">
-    <select name="type">
+    <select name="filetype">
       <option>image/png</option>
       <option>image/jpeg</option>
       <option>image/whatever</option>
@@ -162,11 +162,11 @@
     <input type="submit" value="Submit">
   </form>
   <script>
-    var form = document.getElementById('jsform5');
-    form.addEventListener('submit', function(e) {
+    let form5 = document.getElementById('jsform5');
+    form5.addEventListener('submit', function(e) {
       e.preventDefault();
-      var data = new FormData(form);
-      data.append('image', getMandelasDataURL(form.type.value), 'mandel.brot');
+      let data = new FormData(form5);
+      data.append('image', getMandelasDataURL(form5.filetype.value));
       fetch('/api', {
         method: 'POST',
         body: data
@@ -183,7 +183,7 @@
   <form id="jsform6">
     <input type="text" name="name" value="John">
     <input type="text" name="age" value="25">
-    <select name="type">
+    <select name="filetype">
       <option>image/png</option>
       <option>image/jpeg</option>
       <option>image/whatever</option>
@@ -191,11 +191,11 @@
     <input type="submit" value="Submit">
   </form>
   <script>
-    var form = document.getElementById('jsform6');
-    form.addEventListener('submit', async function(e) {
+    let form6 = document.getElementById('jsform6');
+    form6.addEventListener('submit', async function(e) {
       e.preventDefault();
-      var data = new FormData(form);
-      data.append('image', await getMandelasBlob(form.type.value), 'mandel.brot');
+      let data = new FormData(form6);
+      data.append('image', await getMandelasBlob(form6.filetype.value), 'mandel.brot');
       fetch('/api', {
         method: 'POST',
         body: data
@@ -210,8 +210,8 @@
 <canvas id="mandel"></canvas>
 <script>
 // mandelbrot example
-var canvas = document.getElementById('mandel');
-var ctx = canvas.getContext('2d');
+let canvas = document.getElementById('mandel');
+let ctx = canvas.getContext('2d');
 
 const WIDTH = 40;
 const HEIGHT = 30;
@@ -256,12 +256,12 @@ function draw() {
   }
 }
 
-function getMandelasDataURL(type) {
-  return canvas.toDataURL(type);
+function getMandelasDataURL(ftype) {
+  return canvas.toDataURL(ftype);
 }
 
-async function getMandelasBlob(type) {
-  return await new Promise(res => canvas.toBlob(res, type));
+async function getMandelasBlob(ftype) {
+  return await new Promise(res => canvas.toBlob(res, ftype));
 }
 
 draw();
