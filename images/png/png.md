@@ -1,6 +1,6 @@
 # Portable Network Graphics
 
-One of the most widely used raster image formats, that supports lossless compression, alpha transparency and is supported by all the webbrowsers. It was developed as an improved, non-patented replacement for GIF (*"PNG's not GIF"*).
+One of the most widely used raster image formats, that supports lossless compression, alpha transparency and is supported by all the webbrowsers. It was developed in 1996 as an improved, non-patented replacement for GIF (*"PNG's not GIF"*). ISO and IETF standard.
 
 Features:
 
@@ -78,7 +78,7 @@ After the header comes a series af chunks:
 
 - interlace method (1 byte, 0 - no interlace, 1 - Adam7 interlace)
 
-[13 bytes total]
+- 13 bytes total
 
 `IEND`
 
@@ -118,6 +118,103 @@ After the header comes a series af chunks:
 
 ...
 
+### Pixel format
 
+`IHDR` bit depth + color type
+
+**Bit depth**
+
+- Indexed: 1, 2, 4, 8 bit per pixel (2, 4, 16, 256 colors)
+
+- Grayscale: 1, 2, 4, 8, 16 bpp
+
+- Gs+alpha: 16 or 32 bpp
+
+- Truecolor: 24 or 48 bpp
+
+- Truecolor+alpha: 32 or 64 bpp
+
+**Color type**
+
+Bitmask:
+
+- bit value 1: indexed (palette)
+
+- bit value 2: rgb (or trichromatic), grayscale (relative luminance) otherwise
+
+- bit value 4: alpha channel (per pixel)
+
+Possible values:
+
+- 0: grayscale
+
+- 2: rgb/truecolor
+
+- 3: indexed (colors in palette can have alpha transparency, individual pixels don't)
+
+- 4: grayscale + alpha
+
+- 6: rgb+alpha
+
+### Compression
+
+lossless, 2 stage:
+
+- filtering (~prediction)
+
+- DEFLATE - LZ77 + Huffman coding
+
+#### Filtering
+
+One filter *method* for the entire image (well, currently there's only one in the standard, '0'), and one filter *type* per line.
+
+The filter *predicts* the value of each pixel based on previous pixels, and substracts the predicted color from the actual value. In many cases this results in a more compressible line.
+
+**Filter types**
+
+(type - name - predicted value)
+
+- 0 - *None* - zero (no prediction)
+
+- 1 - *Sub* - pixel to the left
+
+- 2 - *Up* - pixel above
+
+- 3 - *Average* - mean of left + above pixel (rounded down)
+
+- 4 - *Paeth* - (left), (above), or (left-above), whichever is closest to *p = (left) + (above) - (left-above)*
+
+### Interlacing
+
+Optional, 2 dimensional, 7 pass scheme (Adam7).
+
+8x8 blocks:
+
+```
+1 6 4 6 2 6 4 6
+7 7 7 7 7 7 7 7
+5 6 5 6 5 6 5 6
+7 7 7 7 7 7 7 7
+3 6 4 6 3 6 4 6
+7 7 7 7 7 7 7 7
+5 6 5 6 5 6 5 6
+7 7 7 7 7 7 7 7
+```
+
+![](https://upload.wikimedia.org/wikipedia/commons/2/27/Adam7_passes.gif)
+
+Reduces data compressibility - filtering uses neighbour pixels for prediction, with interlacing this isn't that much effective.
+
+### Animation
+
+Many "extension" that adds animation to PNG, the most widely supported one is **APNG** (which is not "standardised" by the PNG Group, but still), all major browsers and operating systems support it.
+
+Backward compatible:
+
+- `acTL` chunk for generic animation data (frame number, loop count)
+
+- one `IDAT` chunk - "normal" PNG decoders will display a still image
+
+- multiple `fcTL`and `fdAT` chunks for further frames (metadata + data)
 
 
