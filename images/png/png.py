@@ -3,6 +3,7 @@
 import struct
 import zlib
 import os
+import sys
 
 from typing import List, Tuple
 
@@ -32,14 +33,19 @@ def read_chunk(f):
     return chunk_type, chunk_data
 
 
-def rgbcolor(r, g, b):
-    return f'\x1b[38;2;{r};{g};{b}m█\x1b[0m'
+def rgbcolor(r, g, b, r2, g2, b2):
+    return f'\x1b[38;2;{r};{g};{b}m\x1b[48;2;{r2};{g2};{b2}m▀\x1b[0m'
 
 
 def display_image(img):
-    for y in range(len(img)):
+    for y in range(0, len(img), 2):
         for x in range(len(img[y])):
-            print(rgbcolor(*img[y][x]), end='')
+            c1 = img[y][x]
+            if len(img) > y:
+                c2 = img[y+1][x]
+            else:
+                c2 = (0, 0, 0)
+            print(rgbcolor(*c1, *c2), end='')
         print()
 
 
@@ -63,22 +69,22 @@ FILTERS = {
     0: lambda x, a, b, c: x,
     1: lambda x, a, b, c: (x + a) % 256,
     2: lambda x, a, b, c: (x + b) % 256,
-    3: lambda x, a, b, c: ((x + a) + (x + b) // 2) % 256,
+    3: lambda x, a, b, c: ((x + a) % 256 + (x + b) % 256) // 2,
     4: lambda x, a, b, c: paeth(x, a, b, c),
 }
 
 
 def restore_filters(ft, bpp, r, lr):
     # TODO bpp
-    lrs = [0, 0, 0] + lr[:-bpp]
+    lrs = [0 for _ in range(bpp)] + lr[:-bpp]
     row = []
 
-    rpx = [(r, g, b) for r, g, b in zip(r[::bpp], r[1::bpp], r[2::bpp])]
-    lrpx = [(r, g, b) for r, g, b in zip(lr[::bpp], lr[1::bpp], lr[2::bpp])]
-    lrspx = [(r, g, b) for r, g, b in zip(lrs[::bpp], lrs[1::bpp], lrs[2::bpp])]
+    rpx = zip(*(r[i::bpp] for i in range(bpp)))
+    lrpx = zip(*(lr[i::bpp] for i in range(bpp)))
+    lrspx = zip(*(lrs[i::bpp] for i in range(bpp)))
 
     for x, b, c in zip(rpx, lrpx, lrspx):
-        a = (0, 0, 0)
+        a = [0 for _ in range(bpp)]
         if len(row) > 0:
             a = row[-bpp:]
 
@@ -89,8 +95,13 @@ def restore_filters(ft, bpp, r, lr):
     return row
 
 
+filename = 'example_rgb.png'
+
+if sys.argv[1:]:
+    filename = sys.argv[1]
+
 # read the file
-f = open('example_rgb.png', 'rb')
+f = open(filename, 'rb')
 
 # check the header
 png_signature = b'\x89PNG\r\n\x1a\n'
@@ -114,11 +125,14 @@ while True:
         width = struct.unpack('>I', chunk_data[0:4])[0]
         height = struct.unpack('>I', chunk_data[4:8])[0]
         width, height, bitd, colort, compm, filterm, interlacem = struct.unpack('>IIBBBBB', chunk_data)
-        bpp = 3  # TODO
+        if colort == 2:
+            bpp = 3  # RGB
+        elif colort == 6:
+            bpp = 4
 
         log(f'width = {width}, height = {height}, bitd = {bitd}, colort = {colort}, compm = {compm}, filterm = {filterm}, interlacem = {interlacem}')
 
-        if compm != 0 or filterm != 0 or interlacem != 0 or colort != 2 or bitd != 8:
+        if compm != 0 or filterm != 0 or interlacem != 0 or bpp == 0 or bitd != 8:
             print('We only support 8-bit rgb non-interlaced images')
             exit()
 
@@ -136,7 +150,7 @@ while True:
         rows = [data[i:i+1+width*bpp] for i in range(0, len(data), 1+width*bpp)]
         log(f'rows length = {len(rows)}')
 
-        last_row = [0 for x in range(width*bpp)]
+        last_row = [0 for _ in range(width*bpp)]
         for y, r in enumerate(rows):
             filter_type = r[0]
 
@@ -145,7 +159,7 @@ while True:
 
             pixels = [row[i:i+bpp] for i in range(0, len(row), bpp)]
             for x, pixel in enumerate(pixels):
-                image[y][x] = (int(pixel[0]), int(pixel[1]), int(pixel[2]))  # TODO bpp
+                image[y][x] = (int(pixel[0]), int(pixel[1]), int(pixel[2]))  # alpha ignored
 
     if chunk_type == b'IEND':
         break
