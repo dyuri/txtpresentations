@@ -215,6 +215,6 @@ Backward compatible:
 
 - one `IDAT` chunk - "normal" PNG decoders will display a still image
 
-- multiple `fcTL`and `fdAT` chunks for further frames (metadata + data)
+- multiple `fcTL` and `fdAT` chunks for further frames (metadata + data)
 
 
