@@ -4,7 +4,7 @@ Invented by Denso Wave (japanese automotive company, subsidiary of Toyota) in 19
 
 ## Parts
 
-![](/home/dyuri/www/prezik/txtpresentations/qrcode/qrcode.png)
+![QR code parts explained](qrcode.png)
 
 - Finder patterns - helps the reader to detect the code
 
@@ -66,7 +66,7 @@ Reed-Solomon error correction is used - it is very wide used, for example for CD
 
 QR code readers work best when there are the same amount of black and white areas, and they are iterating. But real world data does not work this way, so there are 8 types of masks to apply (via XOR) and the best one is chosen.
 
-![](/home/dyuri/www/prezik/txtpresentations/qrcode/qr_masks.png)
+![QR code mask types](qr_masks.png)
 
 *(image source: wikipedia.org)*
 
@@ -78,7 +78,7 @@ QR code readers work best when there are the same amount of black and white area
 
 
 
-![](/home/dyuri/www/prezik/txtpresentations/qrcode/qrcode_logo.png)
+![QR code with profile picture](qrcode_logo.png)
 
 
 
