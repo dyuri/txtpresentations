@@ -10,4 +10,5 @@
 - [Go Basics](golang/golang.md), [Go Advanced](golang/golang_adv.md)
 - [HTML Form data](formdata/formdata.md)
 - [Image formats: PNG](images/png/png.md)
+- [Image formats: JPEG](images/jpg/jpg.md)
 - [QR code](qrcode/qr.md)
