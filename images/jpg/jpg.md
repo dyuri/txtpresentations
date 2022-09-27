@@ -68,7 +68,7 @@ Examples
 
 - ...
 
-![](/home/dyuri/www/prezik/txtpresentations/images/jpg/chroma_subsampling.png)
+![](chroma_subsampling.png)
 
 ### Block splitting
 
@@ -82,7 +82,7 @@ Discrete Cosine Transform (~DFT, but only using **real** numbers)
 
 Each block from the previous step is converted to a frequency-domain representation using DCT.
 
-![](/home/dyuri/www/prezik/txtpresentations/images/jpg/dctjpeg.png)
+![](dctjpeg.png)
 
 ### Quantization
 
